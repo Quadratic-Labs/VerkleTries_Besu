@@ -1,1 +1,19 @@
-ipa-multipoint/ipa_multipoint_jni/target/*
+build
+target
+
+Cargo.lock
+
+.idea
+.classpath
+.project
+.settings
+
+.gradle
+
+## build files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
