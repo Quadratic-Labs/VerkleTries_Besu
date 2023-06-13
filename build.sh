@@ -58,19 +58,6 @@ fi
 # add to path brew
 [ -f $HOME/.zprofile ] && . $HOME/.zprofile
 
-
-build_jars(){
-  ########################
-  ###### build jars ######
-  ########################
-
-  if [[ "$SKIP_GRADLE" != "true" ]]; then
-    cd $SCRIPTDIR
-    ./gradlew build
-  fi
-}
-
-
 build_ipa_multipoint() {
   cat <<EOF
   ##################################
@@ -106,6 +93,17 @@ EOF
   cp target/release/libipa_multipoint_jni.* "$SCRIPTDIR/ipa-multipoint/build/${OSARCH}/lib"
 }
 
+
+build_jars(){
+  ########################
+  ###### build jars ######
+  ########################
+
+  if [[ "$SKIP_GRADLE" != "true" ]]; then
+    cd $SCRIPTDIR
+    ./gradlew build
+  fi
+}
 
 build_ipa_multipoint
 
