@@ -17,10 +17,9 @@ package org.hyperledger.besu.nativelib.ipa_multipoint;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.hyperledger.besu.nativelib.ipamultipoint.LibIpaMultipoint;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;

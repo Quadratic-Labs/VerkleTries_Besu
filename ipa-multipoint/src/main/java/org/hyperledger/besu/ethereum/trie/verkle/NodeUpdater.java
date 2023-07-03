@@ -21,4 +21,5 @@ public interface NodeUpdater {
     //This method is called to ask Besu to save the node in the database (value is the node represented as a list of bytes.
     //RLP or something else for verkle).
     void store(Bytes location, Bytes32 hash, Bytes value);
+    VerkleNode load(Bytes location);
 }
