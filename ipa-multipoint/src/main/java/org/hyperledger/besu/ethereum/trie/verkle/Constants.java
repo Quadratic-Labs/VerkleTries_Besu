@@ -18,4 +18,8 @@ public final class Constants {
     static int getSuffix(Bytes32 key) {
         return key.slice(Constants.STEM_SIZE).toInt(LITTLE_ENDIAN);  // Assumes STEM_SIZE >= 28
     }
+
+    static int getWordAtDepth(Bytes key, int depth) {
+        return key.get(depth) & 0xff;  // cast signed byte to "unsigned" int
+    }
 }
