@@ -5,11 +5,17 @@ import java.util.Map;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
+import org.hyperledger.besu.ethereum.trie.verkle.bandersnatch.Point;
 
 public class LeafNode implements VerkleNode{
     Bytes stem;
     int depth;
     Map<Integer, Bytes> values;  // TODO: use extension + suffix structure instead.
+
+    Point C1;
+    Point C2;
+
+    Point commitment;
 
     public LeafNode(Bytes stem, int depth) {
         this.stem = stem;

@@ -22,6 +22,7 @@ plugins {
 dependencies {
     implementation 'net.java.dev.jna:jna:5.12.1'
     implementation 'org.apache.tuweni:tuweni-bytes:2.2.0'
+    implementation 'org.apache.tuweni:tuweni-units:2.2.0'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
