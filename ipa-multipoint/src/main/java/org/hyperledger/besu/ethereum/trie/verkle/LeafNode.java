@@ -2,6 +2,7 @@ package org.hyperledger.besu.ethereum.trie.verkle;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
+import org.hyperledger.besu.ethereum.trie.verkle.bandersnatch.Point;
 
 public class LeafNode implements VerkleNode{
     Bytes stem;
@@ -10,6 +11,11 @@ public class LeafNode implements VerkleNode{
     Bytes[] subCommitments;  // C1, C2 in EIP
     Bytes32[] values;
     boolean isDirty;
+
+    Point C1;
+    Point C2;
+
+    Point commitment;
 
     public LeafNode(Bytes stem, int depth) {
         this.stem = stem;
