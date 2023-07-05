@@ -51,6 +51,53 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
     return javaarray;
 }
 
+#[no_mangle]
+pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaMultipoint_update_commitment(env: JNIEnv,
+                                                                                                 _class: JClass<'_>,
+                                                                                                 input: jobjectArray)
+                                                                                                 -> jbyteArray {
+    // input = index, old, new, commitment
+    let length = env.get_array_length(input).unwrap();
+    let len = <usize as TryFrom<jsize>>::try_from(length)
+        .expect("invalid jsize, in jsize => usize conversation");
+
+    if len != 4 {
+        env.throw_new("java/lang/IllegalArgumentException", "Invalid input length")
+           .expect("Failed to throw exception");
+        return std::ptr::null_mut(); // Return null pointer to indicate an error
+    }    
+
+    // TODO: implement update a commitment by commiting
+    // new = H(0, ..., new-old, 0, ...)  (non-zero at index)
+    // commitment + new
+    // Computing new should be optimised.
+    let index_obj = env.get_object_array_element(input, i).expect("Failed to retrieve commitment value");
+    let index: u16 = env.get_int_field(index_obj, "value", "I").expect("Failed to get int field").into();
+
+    let jbarray: jbyteArray = env.get_object_array_element(input, 1).unwrap().cast();
+    let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
+    let old = Fr::read(barray.as_ref()).unwrap());
+
+    let jbarray: jbyteArray = env.get_object_array_element(input, 2).unwrap().cast();
+    let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
+    let new = Fr::read(barray.as_ref()).unwrap());
+
+    let jbarray: jbyteArray = env.get_object_array_element(input, 3).unwrap().cast();
+    let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
+    let old_commitment = Fr::read(barray.as_ref()).unwrap());
+
+    // TODO: write update logic, where poly[index] updates from old to new
+    let mut vec = Vec::with_capacity(256):
+    let poly = LagrangeBasis::new(vec);
+    let crs = CRS::new(256, PEDERSEN_SEED);
+    let result = crs.commit_lagrange_poly(&poly);
+    let mut result_bytes = [0u8; 128];
+    result.write(result_bytes.as_mut()).unwrap();
+    let javaarray = env.byte_array_from_slice(&result_bytes).expect("Couldn't convert to byte array");
+    return javaarray;
+}
+
+
 #[cfg(test)]
 mod tests {
     use std::ops::Deref;

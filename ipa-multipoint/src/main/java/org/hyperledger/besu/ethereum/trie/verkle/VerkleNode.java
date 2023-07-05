@@ -1,14 +1,17 @@
 package org.hyperledger.besu.ethereum.trie.verkle;
 
 import org.apache.tuweni.bytes.Bytes32;
-// import org.apache.tuweni.bytes.Bytes;
+import org.apache.tuweni.bytes.Bytes;
 // import org.hyperledger.besu.ethereum.trie.verkle.NodeUpdater;
 
 
 public interface VerkleNode {
+    Bytes getCommitment() throws Exception;
+    void setCommitment() throws Exception;
+
     // Insert or Update value into the tree
     void insert(Bytes32 key, Bytes32 value) throws Exception;
-
+    
     // Delete a leaf with the given key
     // boolean delete(byte[] key, NodeUpdater updater) throws Exception;
 

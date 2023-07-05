@@ -74,4 +74,33 @@ public class InternalNodeTest {
         assertThat(node.children[17]).isInstanceOf(LeafNode.class);
         assertThat(node.children[255]).isInstanceOf(LeafNode.class);
     }
+
+    @Test
+    public void testDivergentAtLowDepth() throws Exception {
+        InternalNode root = new InternalNode();
+        Bytes32 key1 = Bytes32.fromHexString("0x00112233445566778899aabbccddeeff00112233445566778899aabbccddeeff");
+        Bytes32 value1 = Bytes32.fromHexString("0x1000000000000000000000000000000000000000000000000000000000000000");
+        Bytes32 key2 = Bytes32.fromHexString("0x00112233445566778899aabbccddeeff00112233445566778899aabbccdd00ff");
+        Bytes32 value2 = Bytes32.fromHexString("0x0100000000000000000000000000000000000000000000000000000000000000");
+        Bytes32 key3 = Bytes32.fromHexString("0x00112233445566778899aabbccddee0000112233445566778899aabbccddeeff");
+        Bytes32 value3 = Bytes32.fromHexString("0x0010000000000000000000000000000000000000000000000000000000000000");
+        root.insert(key1, value1);
+        root.insert(key2, value2);
+        root.insert(key3, value3);
+        InternalNode cursor = root;
+        for (int i = 0; i < 30; i++) {
+            int index = Constants.getWordAtDepth(key1, i);
+            assertThat(cursor.children[index]).isInstanceOf(InternalNode.class);
+            cursor = (InternalNode) cursor.children[index];
+        }
+        assertThat(cursor.children[0]).isInstanceOf(LeafNode.class);
+        assertThat(cursor.children[238]).isInstanceOf(LeafNode.class);
+        cursor = root;
+        for (int i = 0; i < 15; i++) {
+            int index = Constants.getWordAtDepth(key3, i);
+            assertThat(cursor.children[index]).isInstanceOf(InternalNode.class);
+            cursor = (InternalNode) cursor.children[index];
+        }
+        assertThat(cursor.children[0]).isInstanceOf(LeafNode.class);
+    }
 }
