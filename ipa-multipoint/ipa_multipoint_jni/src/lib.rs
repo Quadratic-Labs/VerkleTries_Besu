@@ -68,8 +68,9 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
         return std::ptr::null_mut(); // Return null pointer to indicate an error
     }    
 
-    let index_obj = env.get_object_array_element(input, i).expect("Failed to retrieve commitment value");
-    let index: u16 = env.get_int_field(index_obj, "value", "I").expect("Failed to get int field").into();
+    let index_obj = env.get_object_array_element(input, 0).expect("Failed to retrieve commitment value");
+    let j_value = env.get_field(index_obj, "value", "I").expect("Failed to get field value");
+    let index = j_value.i().expect("Expected int value") as u16;
 
     let jbarray: jbyteArray = env.get_object_array_element(input, 1).unwrap().cast();
     let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
@@ -83,16 +84,25 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
     let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
     let old_commitment = Fr::read(barray.as_ref()).unwrap();
 
+
     let delta = new - old;
     let mut vec = vec![Fr::zero(); 256];
-    vec[index] = delta;
+    vec[index as usize] = delta;
     let poly = LagrangeBasis::new(vec);
     let crs = CRS::new(256, PEDERSEN_SEED);
     let new_commitment = crs.commit_lagrange_poly(&poly);
-    let result = new_commitment + old_commitment;
+    
+    // Converting the new commitment to a Fr so we can add it to the old commitment
+    // Still a bit unsure if the right way to do, but we will discover it soon with proper tests :)
+    let mut new_commitment_bytes = [0u8; 128];
+    new_commitment.write(new_commitment_bytes.as_mut()).unwrap();
+    let new_commitment_field = Fr::read(&new_commitment_bytes[..]).unwrap();
+
+    let result = old_commitment + new_commitment_field;
 
     let mut result_bytes = [0u8; 128];
     result.write(result_bytes.as_mut()).unwrap();
+
     let javaarray = env.byte_array_from_slice(&result_bytes).expect("Couldn't convert to byte array");
     return javaarray;
 }
@@ -107,8 +117,72 @@ mod tests {
     use bandersnatch::Fr;
     use hex;
     use jni::{InitArgsBuilder, JavaVM};
+    use jni::objects::JValue;
+    use jni::objects::JObject;
 
     use crate::Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaMultipoint_commit;
+    use crate::Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaMultipoint_update_commitment;
+
+    #[test]
+    fn update_commitment_multiproof_lagrange() {
+
+        //TODO: put actual values, not just random ones
+        let old_from_repr = Fr::from(BigInteger256([
+            0x7a9f997fa79c7383,
+            0x4eb4348c4ce95c1e,
+            0x92db548f1f5e928a,
+            0x1ed6c0aaf410491,
+        ]));
+    
+        let new_from_repr = Fr::from(BigInteger256([
+            0xc81265fb4130fe0c,
+            0xb308836c14e22279,
+            0x699e887f96bff372,
+            0x84ecc7e76c11ad,
+        ]));
+    
+        let commitment_from_repr = Fr::from(BigInteger256([
+            0x846ee876c11ad94a,
+            0x847dd5e928d45c9f,
+            0xb308836c14e22279,
+            0x84ecc7e76c11ad,
+        ]));
+    
+        let mut old_bytes = [0u8; 32];
+        let mut new_bytes = [0u8; 32];
+        let mut commitment_bytes = [0u8; 32];
+        old_from_repr.write(old_bytes.as_mut()).unwrap();
+        new_from_repr.write(new_bytes.as_mut()).unwrap();
+        commitment_from_repr.write(commitment_bytes.as_mut()).unwrap();
+    
+        let index = 10;
+    
+        let jvm_args = InitArgsBuilder::default().build().unwrap();
+        let jvm = JavaVM::new(jvm_args).unwrap();
+        let guard = jvm.attach_current_thread().unwrap();
+        let env = guard.deref();
+        let class = env.find_class("java/lang/String").unwrap();
+    
+        let old_jarray = env.byte_array_from_slice(&old_bytes).unwrap();
+        let new_jarray = env.byte_array_from_slice(&new_bytes).unwrap();
+        let commitment_jarray = env.byte_array_from_slice(&commitment_bytes).unwrap();
+        let objclass = env.find_class("java/lang/Object").unwrap();
+        let objarray = env.new_object_array(4, objclass, JObject::null()).unwrap();
+                
+        let integer_class = env.find_class("java/lang/Integer").unwrap();
+        let args = [JValue::from(index)];
+        let java_integer = env.call_static_method(integer_class, "valueOf", "(I)Ljava/lang/Integer;", &args).unwrap().l().unwrap();
+    
+        env.set_object_array_element(objarray, 0, java_integer).expect("cannot set input");
+        env.set_object_array_element(objarray, 1, old_jarray).expect("cannot set input");
+        env.set_object_array_element(objarray, 2, new_jarray).expect("cannot set input");
+        env.set_object_array_element(objarray, 3, commitment_jarray).expect("cannot set input");
+        let result = Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaMultipoint_update_commitment(*env, class, objarray);
+        let result_u8 = env.convert_byte_array(result).unwrap();
+    
+        // TODO: put actual result of the values 
+        assert_eq!("2", "1");
+    }
 
     #[test]
     fn commit_multiproof_lagrange() {
