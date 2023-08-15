@@ -1,49 +1,73 @@
 package org.hyperledger.besu.ethereum.trie.verkle;
 
-import java.lang.ref.SoftReference;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Optional;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 
-public class LeafNode<V> implements Node<V>{
-    private final Optional<Bytes> location;
-    private final Bytes path;
-    protected final V value;
-    private SoftReference<Bytes32> hash;
-    private boolean dirty = false;
 
-    public LeafNode(
+public class BranchNode<V> implements Node<V> {
+    @SuppressWarnings("rawtypes")
+    protected static final Node NULL_NODE = NullNode.instance();
+
+    private final Optional<Bytes> location;  // Location in the tree
+    private Bytes32 hash;  // vector commitment of all children's commitments
+    private boolean isDirty = false;  // should be flushed to storage
+    private boolean needsHealing = false;  // should children be synced with storage
+    private List<Node<V>> children;
+
+    public BranchNode(
             final Bytes location,
-            final Bytes path,
-            final V value) {
+            final ArrayList<Node<V>> children) {
+        assert (children.size() == maxChild());
         this.location = Optional.ofNullable(location);
-        this.path = path;
-        this.value = value;
+        this.children = children;
     }
 
-    public LeafNode(
-            final Bytes path,
-            final V value) {
-        this.location = Optional.empty();
-        this.path = path;
-        this.value = value;
+    public BranchNode(Bytes location) {
+        this.location = Optional.ofNullable(location);
+        this.children = new ArrayList<>();
+        for (int i = 0; i < Constants.NODE_WIDTH; i++) {
+            children.add(NULL_NODE);
+        }
+    }
+
+    public int maxChild() {
+        return 256;
+    }
+
+    public Node<V> child(final byte childIndex) {
+        return children.get(childIndex);
+    }
+
+    public void replaceChild(final byte index, final Node<V> childNode) {
+        children.set(index, childNode);
+    }
+
+    public Bytes32 getHash() {
+        return hash;
+    }
+
+    public void setHash(Bytes32 hash) {
+        this.hash = hash;
+    }
+
+    public Bytes getPath() {
+        return Bytes.EMPTY;
     }
 
     @Override
-    public Node<V> accept(final PathNodeVisitor<V> visitor, final Bytes path) {
-        return visitor.visit(this, path);
+    public Node<V> accept(PathNodeVisitor<V> visitor, Bytes path) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'accept'");
     }
 
     @Override
     public Optional<V> getValue() {
-        return Optional.ofNullable(value);
-    }
-
-    @Override
-    public Bytes getPath() {
-        return path;
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getValue'");
     }
 
     @Override
@@ -62,12 +86,6 @@ public class LeafNode<V> implements Node<V>{
     public Bytes getEncodedBytesRef() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getEncodedBytesRef'");
-    }
-
-    @Override
-    public Bytes32 getHash() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getHash'");
     }
 
     @Override

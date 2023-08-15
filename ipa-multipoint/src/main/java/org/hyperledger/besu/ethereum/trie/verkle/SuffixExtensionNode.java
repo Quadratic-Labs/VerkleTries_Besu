@@ -1,34 +1,38 @@
 package org.hyperledger.besu.ethereum.trie.verkle;
 
-import java.lang.ref.SoftReference;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 
-public class LeafNode<V> implements Node<V>{
+public class SuffixExtensionNode<V> implements Node<V>  {
     private final Optional<Bytes> location;
-    private final Bytes path;
-    protected final V value;
-    private SoftReference<Bytes32> hash;
+    private final Bytes path;  // path can store the stem.
+    private Bytes32 hash;
+    private Node<V> lowChild;
+    private Node<V> highChild;
     private boolean dirty = false;
 
-    public LeafNode(
+    public SuffixExtensionNode(
             final Bytes location,
             final Bytes path,
-            final V value) {
+            final Node<V> lowChild,
+            final Node<V> highChild) {
         this.location = Optional.ofNullable(location);
         this.path = path;
-        this.value = value;
+        this.lowChild = lowChild;
+        this.highChild = highChild;
     }
 
-    public LeafNode(
+    public SuffixExtensionNode(
             final Bytes path,
-            final V value) {
+            final Node<V> lowChild,
+            final Node<V> highChild) {
         this.location = Optional.empty();
         this.path = path;
-        this.value = value;
+        this.lowChild = lowChild;
+        this.highChild = highChild;
     }
 
     @Override
@@ -37,15 +41,16 @@ public class LeafNode<V> implements Node<V>{
     }
 
     @Override
-    public Optional<V> getValue() {
-        return Optional.ofNullable(value);
-    }
-
-    @Override
     public Bytes getPath() {
         return path;
     }
 
+    @Override
+    public Optional<V> getValue() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getChildren'");
+    }
+        
     @Override
     public List<Node<V>> getChildren() {
         // TODO Auto-generated method stub
