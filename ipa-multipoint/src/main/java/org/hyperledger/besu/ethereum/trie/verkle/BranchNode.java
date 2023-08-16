@@ -13,6 +13,7 @@ public class BranchNode<V> implements Node<V> {
     protected static final Node NULL_NODE = NullNode.instance();
 
     private final Optional<Bytes> location;  // Location in the tree
+    private final Bytes path;  // common children's trie-key prefix
     private Bytes32 hash;  // vector commitment of all children's commitments
     private boolean isDirty = false;  // should be flushed to storage
     private boolean needsHealing = false;  // should children be synced with storage
@@ -20,14 +21,17 @@ public class BranchNode<V> implements Node<V> {
 
     public BranchNode(
             final Bytes location,
+            final Bytes path,
             final ArrayList<Node<V>> children) {
         assert (children.size() == maxChild());
         this.location = Optional.ofNullable(location);
+        this.path = path;
         this.children = children;
     }
 
-    public BranchNode(Bytes location) {
+    public BranchNode(final Bytes location, final Bytes path) {
         this.location = Optional.ofNullable(location);
+        this.path = path;
         this.children = new ArrayList<>();
         for (int i = 0; i < Constants.NODE_WIDTH; i++) {
             children.add(NULL_NODE);
@@ -55,7 +59,7 @@ public class BranchNode<V> implements Node<V> {
     }
 
     public Bytes getPath() {
-        return Bytes.EMPTY;
+        return path;
     }
 
     @Override

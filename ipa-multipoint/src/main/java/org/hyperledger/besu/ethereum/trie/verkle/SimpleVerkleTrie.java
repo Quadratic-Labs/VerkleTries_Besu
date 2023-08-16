@@ -39,25 +39,20 @@ public class SimpleVerkleTrie<K extends Bytes, V> implements VerkleTrie<K, V> {
     @Override
     public Optional<V> get(final K key) {
         checkNotNull(key);
-        return root.accept(getGetVisitor(), key).getValue();
+        return root.accept(new GetVisitor(), key).getValue();
     }
 
     @Override
     public void put(final K key, final V value) {
         checkNotNull(key);
         checkNotNull(value);
-        this.root = root.accept(getPutVisitor(value), key);
-    }
-    @Override
-    public void put(final K key, final PathNodeVisitor<V> putVisitor) {
-        checkNotNull(key);
-        this.root = root.accept(putVisitor, bytesToPath(key));
+        this.root = root.accept(new PutVisitor(value), key);
     }
 
     @Override
     public void remove(final K key) {
         checkNotNull(key);
-        this.root = root.accept(getRemoveVisitor(), key);
+        this.root = root.accept(new RemoveVisitor(), key);
     }
 
     @Override
