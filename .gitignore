@@ -8,6 +8,8 @@ Cargo.lock
 .project
 .settings
 
+.vscode
+
 .gradle
 
 ## build files
