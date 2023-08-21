@@ -17,6 +17,8 @@ use std::ops::Add;
 use ark_ff::bytes::{FromBytes, ToBytes};
 use ark_ff::{Zero};
 use banderwagon::{ Element};
+use bandersnatch::Fr;
+use banderwagon::multi_scalar_mul;
 use ipa_multipoint::lagrange_basis::LagrangeBasis;
 use ipa_multipoint::crs::CRS;
 use jni::JNIEnv;
@@ -38,12 +40,33 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
     let len = <usize as TryFrom<jsize>>::try_from(length)
         .expect("invalid jsize, in jsize => usize conversation");
     let mut vec = Vec::with_capacity(len);
-    for i in 0..length {
-        let jbarray: jbyteArray = env.get_object_array_element(input, i).unwrap().cast();
-        let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
+    
+    if len != 4 {
+        env.throw_new("java/lang/IllegalArgumentException", "Invalid input length")
+           .expect("Failed to throw exception");
+        return std::ptr::null_mut(); // Return null pointer to indicate an error
+    }    
 
-        vec.push(Fr::read(barray.as_ref()).unwrap())
-    }
+
+    let jbarray: jbyteArray = env.get_object_array_element(input, 0).unwrap().cast();
+    let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
+
+    Element::from_bytes(&[barray[0]]);
+
+    let jbarray: jbyteArray = env.get_object_array_element(input, 1).unwrap().cast();
+    let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
+
+    Element::from_bytes(&[barray[1]]);
+
+    let jbarray: jbyteArray = env.get_object_array_element(input, 2).unwrap().cast();
+    let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
+
+    Element::from_bytes(&[barray[2]]);
+
+    let jbarray: jbyteArray = env.get_object_array_element(input, 3).unwrap().cast();
+    let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
+
+    Element::from_bytes(&[barray[3]]);
 
     let poly = LagrangeBasis::new(vec);
     let crs = CRS::new(256, PEDERSEN_SEED);
@@ -77,27 +100,26 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
 
     let jbarray: jbyteArray = env.get_object_array_element(input, 1).unwrap().cast();
     let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
-    let old = Fr::read(barray.as_ref()).unwrap();
+    let old  = Element::from_bytes(&[barray[1]]).unwrap();
 
     let jbarray: jbyteArray = env.get_object_array_element(input, 2).unwrap().cast();
     let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
-    let new = Fr::read(barray.as_ref()).unwrap();
+    let new = Element::from_bytes(&[barray[2]]).unwrap();
 
 
     let jbarray: jbyteArray = env.get_object_array_element(input, 3).unwrap().cast();
     let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
-    let old_commitment = Fr::read(barray.as_ref()).unwrap();
+    let old_commitment = Element::from_bytes(&[barray[3]]).unwrap();
 
-    let delta = new - old;
-    let mut vec = vec![Fr::zero(); 256];
-    vec[index as usize] = delta;
-    let poly = LagrangeBasis::new(vec);
+    let  vec = vec![Fr::zero(); 256];
+    let poly = LagrangeBasis::new(vec.clone());
     let crs = CRS::new(256, PEDERSEN_SEED);
     let new_commitment = crs.commit_lagrange_poly(&poly);
-    let result = new_commitment.add(&old_commitment);
+    let mut result = banderwagon::multi_scalar_mul(&[old_commitment],&[vec[0].clone()]);
+    result = banderwagon::multi_scalar_mul(&[new_commitment],&[vec[0]]);
 
     let mut result_bytes = [0u8; 128];
-    result.write(result_bytes.as_mut()).unwrap();
+    result.to_bytes();
 
     let javaarray = env.byte_array_from_slice(&result_bytes).expect("Couldn't convert to byte array");
     return javaarray;
