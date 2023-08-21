@@ -16,9 +16,9 @@ use std::convert::TryFrom;
 use std::ops::Add;
 use ark_ff::bytes::{FromBytes, ToBytes};
 use ark_ff::{Zero};
-use bandersnatch::{Fr, EdwardsProjective};
+use banderwagon::{ Element};
 use ipa_multipoint::lagrange_basis::LagrangeBasis;
-use ipa_multipoint::multiproof::CRS;
+use ipa_multipoint::crs::CRS;
 use jni::JNIEnv;
 use jni::objects::JClass;
 use jni::sys::{jbyteArray, jobjectArray, jsize};
@@ -49,7 +49,7 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
     let crs = CRS::new(256, PEDERSEN_SEED);
     let result = crs.commit_lagrange_poly(&poly);
     let mut result_bytes = [0u8; 128];
-    result.write(result_bytes.as_mut()).unwrap();
+    result.to_bytes();
     let javaarray = env.byte_array_from_slice(&result_bytes).expect("Couldn't convert to byte array");
     return javaarray;
 }
@@ -86,7 +86,7 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
 
     let jbarray: jbyteArray = env.get_object_array_element(input, 3).unwrap().cast();
     let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
-    let old_commitment = EdwardsProjective::read(barray.as_ref()).unwrap();
+    let old_commitment = Fr::read(barray.as_ref()).unwrap();
 
     let delta = new - old;
     let mut vec = vec![Fr::zero(); 256];
