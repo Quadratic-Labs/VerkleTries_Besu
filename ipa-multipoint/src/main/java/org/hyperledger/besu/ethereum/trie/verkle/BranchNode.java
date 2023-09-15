@@ -2,6 +2,7 @@ package org.hyperledger.besu.ethereum.trie.verkle;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.tuweni.bytes.Bytes;
@@ -69,26 +70,12 @@ public class BranchNode<V> implements Node<V> {
 
     @Override
     public Optional<V> getValue() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getValue'");
+        return Optional.empty();
     }
 
     @Override
     public List<Node<V>> getChildren() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getChildren'");
-    }
-
-    @Override
-    public Bytes getEncodedBytes() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getEncodedBytes'");
-    }
-
-    @Override
-    public Bytes getEncodedBytesRef() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getEncodedBytesRef'");
+        return children;
     }
 
     @Override
@@ -104,24 +91,21 @@ public class BranchNode<V> implements Node<V> {
 
     @Override
     public boolean isDirty() {
-        return !hash.isPresent() || dirty;
+        return dirty;
     }
 
     @Override
     public String print() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'print'");
-    }
-
-    @Override
-    public boolean isHealNeeded() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isHealNeeded'");
-    }
-
-    @Override
-    public void markHealNeeded() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'markHealNeeded'");
+        final StringBuilder builder = new StringBuilder();
+        builder.append("Branch:");
+        for (int i = 0; i < maxChild(); i++) {
+            final Node<V> child = child((byte) i);
+            if (!Objects.equals(child, NullNode.instance())) {
+                final String branchLabel = "[" + Integer.toHexString(i) + "] ";
+                final String childRep = child.print().replaceAll("\n\t", "\n\t\t");
+                builder.append("\n\t").append(branchLabel).append(childRep);
+            }
+        }
+        return builder.toString();
     }
 }

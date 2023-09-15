@@ -62,16 +62,6 @@ public class NullNode<V> implements Node<V> {
     }
 
     @Override
-    public Bytes getEncodedBytes() {
-        return Bytes.EMPTY;
-    }
-
-    @Override
-    public Bytes getEncodedBytesRef() {
-        return Bytes.EMPTY;
-    }
-
-    @Override
     public Bytes32 getHash() {
         return EMPTY_HASH;
     }
@@ -93,16 +83,6 @@ public class NullNode<V> implements Node<V> {
 
     @Override
     public void markDirty() {
-        // do nothing
-    }
-
-    @Override
-    public boolean isHealNeeded() {
-        return false;
-    }
-
-    @Override
-    public void markHealNeeded() {
         // do nothing
     }
 }

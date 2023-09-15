@@ -1,6 +1,5 @@
 package org.hyperledger.besu.ethereum.trie.verkle;
 
-import java.lang.ref.SoftReference;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,20 +47,7 @@ public class LeafNode<V> implements Node<V>{
 
     @Override
     public List<Node<V>> getChildren() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getChildren'");
-    }
-
-    @Override
-    public Bytes getEncodedBytes() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getEncodedBytes'");
-    }
-
-    @Override
-    public Bytes getEncodedBytesRef() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getEncodedBytesRef'");
+        throw new UnsupportedOperationException("LeafNode does not have children.");
     }
 
     @Override
@@ -88,19 +74,7 @@ public class LeafNode<V> implements Node<V>{
 
     @Override
     public String print() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'print'");
+        return "Leaf:"
+            + getValue().map(Object::toString).orElse("empty");
     }
-
-    @Override
-    public boolean isHealNeeded() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isHealNeeded'");
-    }
-
-    @Override
-    public void markHealNeeded() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'markHealNeeded'");
-    }
-}
+} 
