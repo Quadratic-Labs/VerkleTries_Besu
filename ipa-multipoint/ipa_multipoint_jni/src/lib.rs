@@ -55,7 +55,7 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
         let barray = env.convert_byte_array(jbarray).expect("Couldn't read byte array input");
         let x : usize = 0;
         Element::from_bytes(&[barray[x]]);
-        x=x+1;
+        // x=x+1;
     }
 
     
@@ -119,13 +119,12 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
     let old_commitment = Element::from_bytes(&[barray[3]]).unwrap();
 
     
-    let mut vec = vec![Fr::zero(); 256];
-    let delta = new - old;
-    vec[index as usize] = delta;
-    let poly = LagrangeBasis::new(vec);
+    let vec = vec![Fr::zero(); 256];
+    let poly = LagrangeBasis::new(vec.clone());
     let crs = CRS::new(256, PEDERSEN_SEED);
     let new_commitment = crs.commit_lagrange_poly(&poly);
-    let result = old_commitment + new_commitment;
+    let mut result = banderwagon::multi_scalar_mul(&[old_commitment],&[vec[0].clone()]);
+    result = banderwagon::multi_scalar_mul(&[new_commitment],&[vec[0]]);
     
 
     let mut result_bytes = [0u8; 128];
