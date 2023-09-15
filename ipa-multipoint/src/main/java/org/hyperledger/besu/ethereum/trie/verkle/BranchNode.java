@@ -33,7 +33,7 @@ public class BranchNode<V> implements Node<V> {
         this.location = Optional.ofNullable(location);
         this.path = path;
         this.children = new ArrayList<>();
-        for (int i = 0; i < Constants.NODE_WIDTH; i++) {
+        for (int i = 0; i < maxChild(); i++) {
             children.add(NULL_NODE);
         }
         hash = Optional.of(EMPTY_HASH);
