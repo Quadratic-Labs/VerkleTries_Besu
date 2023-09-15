@@ -37,7 +37,7 @@ public class LibIpaMultipointTest {
   public void testCallLibraryWithManyElements() {
     Bytes input = Bytes.fromHexString("0x0cfe3041fb6512c87922e2146c8308b372f3bf967f889e69ad116ce7c7ec840cfe3041fb6512c87922e2146c8308b372f3bf967f889e69ad116ce7c7ec840cfe3041fb6512c87922e2146c8308b372f3bf967f889e69ad116ce7c7ec840cfe3041fb6512c87922e2146c8308b372f3bf967f889e69ad116ce7c7ec84");
     List<byte[]> params = new ArrayList<>();
-    for (int i = 0 ; i < 128; i++) {
+    for (int i = 0 ; i < 256; i++) {
       params.add(input.toArrayUnsafe());
     }
     byte[] result = LibIpaMultipoint.commit(params.toArray(new byte[][]{}));
