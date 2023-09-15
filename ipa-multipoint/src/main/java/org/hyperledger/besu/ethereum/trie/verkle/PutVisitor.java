@@ -29,14 +29,13 @@ public class PutVisitor<V> implements PathNodeVisitor<V> {
             final Bytes commonPath,
             final Bytes pathSuffix, 
             final Bytes nodeSuffix) {
-        final Node<V> updatedNode = node.replacePath(nodeSuffix);
+        final Node<V> updatedNode = node.replacePath(nodeSuffix.slice(1));
         // Should also add byte to location
-        updatedNode.markDirty();
         BranchNode<V> newBranchNode = new BranchNode<V>(node.getLocation().orElse(Bytes.EMPTY), commonPath);
         newBranchNode.replaceChild(nodeSuffix.get(0), updatedNode);
-        newBranchNode.markDirty();
         final Node<V> insertedNode = newBranchNode.child(pathSuffix.get(0)).accept(this, pathSuffix.slice(1));
-        return insertedNode;
+        newBranchNode.replaceChild(pathSuffix.get(0), insertedNode);
+        return newBranchNode;
     }
 
     @Override
@@ -54,9 +53,9 @@ public class PutVisitor<V> implements PathNodeVisitor<V> {
                 branchNode.markDirty();
             }
             return branchNode;
+        } else {
+            return insertNewBranching(branchNode, commonPath, pathSuffix, nodeSuffix);
         }
-
-        return insertNewBranching(branchNode, commonPath, pathSuffix, nodeSuffix);
     }
 
     @Override
@@ -87,7 +86,6 @@ public class PutVisitor<V> implements PathNodeVisitor<V> {
             path,
             value
         );
-        newNode.markDirty();
         return newNode;
     }
 }

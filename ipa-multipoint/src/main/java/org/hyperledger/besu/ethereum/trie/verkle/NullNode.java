@@ -63,17 +63,17 @@ public class NullNode<V> implements Node<V> {
 
     @Override
     public Bytes getEncodedBytes() {
-        return VerkleTrie.EMPTY_TRIE_NODE;
+        return Bytes.EMPTY;
     }
 
     @Override
     public Bytes getEncodedBytesRef() {
-        return VerkleTrie.EMPTY_TRIE_NODE;
+        return Bytes.EMPTY;
     }
 
     @Override
     public Bytes32 getHash() {
-        return VerkleTrie.EMPTY_TRIE_NODE_HASH;
+        return EMPTY_HASH;
     }
 
     @Override

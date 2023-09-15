@@ -11,8 +11,8 @@ public class LeafNode<V> implements Node<V>{
     private final Optional<Bytes> location;
     private final Bytes path;
     protected final V value;
-    private SoftReference<Bytes32> hash;
-    private boolean dirty = false;
+    private Optional<Bytes32> hash = Optional.empty();
+    private boolean dirty = true;
 
     public LeafNode(
             final Bytes location,
@@ -72,20 +72,18 @@ public class LeafNode<V> implements Node<V>{
 
     @Override
     public Node<V> replacePath(Bytes path) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'replacePath'");
+        LeafNode<V> updatedNode = new LeafNode<V>(location.get(), path, value);
+        return updatedNode;
     }
 
     @Override
     public void markDirty() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'markDirty'");
+        dirty = true;
     }
 
     @Override
     public boolean isDirty() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isDirty'");
+        return dirty;
     }
 
     @Override

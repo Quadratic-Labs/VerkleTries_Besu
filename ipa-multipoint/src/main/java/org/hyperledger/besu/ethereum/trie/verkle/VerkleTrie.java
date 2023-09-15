@@ -21,9 +21,6 @@ import org.apache.tuweni.bytes.Bytes32;
 /** Verkle Trie. */
 public interface VerkleTrie<K, V> {
 
-  Bytes EMPTY_TRIE_NODE = Bytes.EMPTY;
-  Bytes32 EMPTY_TRIE_NODE_HASH = Bytes32.ZERO;
-
   /**
    * Returns an {@code Optional} of value mapped to the hash if it exists; otherwise empty.
    *

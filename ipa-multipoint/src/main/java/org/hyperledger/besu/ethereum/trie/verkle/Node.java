@@ -22,6 +22,8 @@ import org.apache.tuweni.bytes.Bytes32;
 
 public interface Node<V> {
 
+    Bytes32 EMPTY_HASH = Bytes32.ZERO;
+
     Node<V> accept(PathNodeVisitor<V> visitor, Bytes path);
     // void accept(NodeVisitor<V> visitor);
     // void accept(Bytes location, LocationNodeVisitor<V> visitor);
@@ -36,26 +38,11 @@ public interface Node<V> {
 
     List<Node<V>> getChildren();
 
-    Bytes getEncodedBytes();
-
-    Bytes getEncodedBytesRef();
-
-    /**
-     * Whether a reference to this node should be represented as a hash of the rlp, or the node rlp
-     * itself should be inlined (the rlp stored directly in the parent node). If true, the node is
-     * referenced by hash. If false, the node is referenced by its rlp-encoded value.
-     *
-     * @return true if this node should be referenced by hash
-     */
-    default boolean isReferencedByHash() {
-        return getEncodedBytes().size() >= 32;
-    }
-
     Bytes32 getHash();
 
     Node<V> replacePath(Bytes path);
 
-    /** Marks the node as needing to be persisted */
+    /** Marks the node as hash needs syncing */
     void markDirty();
 
     /**
@@ -66,19 +53,4 @@ public interface Node<V> {
     boolean isDirty();
 
     String print();
-
-    /** Unloads the node if it is, for example, a StoredNode. */
-    default void unload() {}
-
-    /**
-     * Return if a node needs heal. If one of its children missing in the storage
-     *
-     * @return true if the node need heal
-     */
-    boolean isHealNeeded();
-
-    /**
-     * Marking a node as need heal means that one of its children is not yet present in the storage
-     */
-    void markHealNeeded();
 }

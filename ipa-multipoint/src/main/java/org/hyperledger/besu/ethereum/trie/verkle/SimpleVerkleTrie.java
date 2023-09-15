@@ -36,6 +36,10 @@ public class SimpleVerkleTrie<K extends Bytes, V> implements VerkleTrie<K, V> {
         this.root = NullNode.instance();
     }
 
+    public Node<V> getRoot() {
+        return root;
+    }
+
     @Override
     public Optional<V> get(final K key) {
         checkNotNull(key);

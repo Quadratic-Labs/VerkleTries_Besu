@@ -14,15 +14,14 @@ public class BranchNode<V> implements Node<V> {
 
     private final Optional<Bytes> location;  // Location in the tree
     private final Bytes path;  // common children's trie-key prefix
-    private Bytes32 hash;  // vector commitment of all children's commitments
-    private boolean isDirty = false;  // should be flushed to storage
-    private boolean needsHealing = false;  // should children be synced with storage
+    private Optional<Bytes32> hash = Optional.empty();  // vector commitment of children's commitments
+    private boolean dirty = true;  // commitment out of sync
     private List<Node<V>> children;
 
     public BranchNode(
             final Bytes location,
             final Bytes path,
-            final ArrayList<Node<V>> children) {
+            final List<Node<V>> children) {
         assert (children.size() == maxChild());
         this.location = Optional.ofNullable(location);
         this.path = path;
@@ -36,6 +35,7 @@ public class BranchNode<V> implements Node<V> {
         for (int i = 0; i < Constants.NODE_WIDTH; i++) {
             children.add(NULL_NODE);
         }
+        hash = Optional.of(EMPTY_HASH);
     }
 
     public int maxChild() {
@@ -43,19 +43,19 @@ public class BranchNode<V> implements Node<V> {
     }
 
     public Node<V> child(final byte childIndex) {
-        return children.get(childIndex);
+        return children.get(Byte.toUnsignedInt(childIndex));
     }
 
     public void replaceChild(final byte index, final Node<V> childNode) {
-        children.set(index, childNode);
+        children.set(Byte.toUnsignedInt(index), childNode);
     }
 
     public Bytes32 getHash() {
-        return hash;
+        return hash.get();
     }
 
     public void setHash(Bytes32 hash) {
-        this.hash = hash;
+        this.hash = Optional.of(hash);
     }
 
     public Bytes getPath() {
@@ -64,8 +64,7 @@ public class BranchNode<V> implements Node<V> {
 
     @Override
     public Node<V> accept(PathNodeVisitor<V> visitor, Bytes path) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'accept'");
+        return visitor.visit(this, path);
     }
 
     @Override
@@ -94,20 +93,18 @@ public class BranchNode<V> implements Node<V> {
 
     @Override
     public Node<V> replacePath(Bytes path) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'replacePath'");
+        BranchNode<V> updatedNode = new BranchNode<V>(location.get(), path, children);
+        return updatedNode;
     }
 
     @Override
     public void markDirty() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'markDirty'");
+        dirty = true;
     }
 
     @Override
     public boolean isDirty() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isDirty'");
+        return !hash.isPresent() || dirty;
     }
 
     @Override
