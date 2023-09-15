@@ -1,53 +1,80 @@
 package org.hyperledger.besu.ethereum.trie.verkle;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 
-public class LeafNode implements VerkleNode{
-    Bytes stem;
-    int depth;
-    Bytes commitment;
-    Bytes[] subCommitments;  // C1, C2 in EIP
-    Bytes32[] values;
-    boolean isDirty;
+public class LeafNode<V> implements Node<V>{
+    private final Optional<Bytes> location;
+    private final Bytes path;
+    protected final V value;
+    private Optional<Bytes32> hash = Optional.empty();
+    private boolean dirty = true;
 
-    public LeafNode(Bytes stem, int depth) {
-        this.stem = stem;
-        this.depth = depth;
-        values = new Bytes32[Constants.NODE_WIDTH];
-        for (int i = 0; i < Constants.NODE_WIDTH; i++) {
-            values[i] = null;
-        }
-        isDirty = false;
+    public LeafNode(
+            final Bytes location,
+            final Bytes path,
+            final V value) {
+        this.location = Optional.ofNullable(location);
+        this.path = path;
+        this.value = value;
     }
 
-    public Bytes getCommitment() {
-        return commitment;
+    public LeafNode(
+            final Bytes path,
+            final V value) {
+        this.location = Optional.empty();
+        this.path = path;
+        this.value = value;
     }
 
-    public void setCommitment(Bytes commitment) {
-        this.commitment = commitment;
+    @Override
+    public Node<V> accept(final PathNodeVisitor<V> visitor, final Bytes path) {
+        return visitor.visit(this, path);
     }
 
-    public void setCommitment() {
-        // TODO: implement this method
-        // H(1, stem, C1, C2, 0, ...)
-        // C1 = commitment of values' first half
-        // C2 = commitment of values' second half
-        // Values take 2 slots, with lower bits are padded with a single 1 (add 2^128).
-        this.commitment = Bytes32.ZERO;
+    @Override
+    public Optional<V> getValue() {
+        return Optional.ofNullable(value);
     }
 
-    public void insert(Bytes32 key, Bytes32 value) throws Exception {
-        Bytes stem = Constants.getStem(key);
-        if (stem.compareTo(stem) != 0) {
-            throw new Exception("Cannot insert key in LeafNode with different stem");
-        }
-        int suffix = Constants.getSuffix(key);
-        insert(suffix, value);
+    @Override
+    public Bytes getPath() {
+        return path;
     }
 
-    public void insert(int suffix, Bytes32 value) throws Exception {
-        values[suffix] = value;
+    @Override
+    public List<Node<V>> getChildren() {
+        throw new UnsupportedOperationException("LeafNode does not have children.");
     }
-}
+
+    @Override
+    public Bytes32 getHash() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getHash'");
+    }
+
+    @Override
+    public Node<V> replacePath(Bytes path) {
+        LeafNode<V> updatedNode = new LeafNode<V>(location.get(), path, value);
+        return updatedNode;
+    }
+
+    @Override
+    public void markDirty() {
+        dirty = true;
+    }
+
+    @Override
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    @Override
+    public String print() {
+        return "Leaf:"
+            + getValue().map(Object::toString).orElse("empty");
+    }
+} 
