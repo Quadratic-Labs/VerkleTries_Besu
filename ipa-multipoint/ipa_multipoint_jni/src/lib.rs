@@ -84,7 +84,7 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
 /// The result is a 256 bit hash
 /// TODO: make the parameters prettier
 fn pedersen_hash(address_input : &Vec<u8>, trie_index_input : &Vec<u8>) -> [u8; 32] {
-    let constant = Fr::from(2u128 + 256u128*64u128);
+    let constant = Fr::from(2u128 + 256u128*64u128); // Hardcoded constant
 
     let address_reference_to_vec: &Vec<u8> = &address_input;
     let address: &[u8] = &*address_reference_to_vec;
