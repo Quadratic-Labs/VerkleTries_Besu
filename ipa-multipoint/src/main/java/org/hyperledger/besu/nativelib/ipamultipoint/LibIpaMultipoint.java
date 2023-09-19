@@ -16,6 +16,7 @@
 package org.hyperledger.besu.nativelib.ipamultipoint;
 
 import com.sun.jna.Native;
+import org.apache.tuweni.bytes.Bytes32;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,4 +52,5 @@ public class LibIpaMultipoint {
    */
   public static native byte[] commit(byte[][] input);
   public static native byte[] update_commitment();
+  public static native byte[] pedersenHash(byte[] input);
 }

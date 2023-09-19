@@ -1,3 +1,6 @@
+use core::ascii;
+use std::array;
+use std::ascii::AsciiExt;
 /*
  * Copyright Besu Contributors
  *
@@ -14,19 +17,151 @@
  */
 use std::convert::TryFrom;
 use std::ops::Add;
+use std::str::FromStr;
 use ark_ff::bytes::{FromBytes, ToBytes};
-use ark_ff::{Zero};
-use banderwagon::{ Element};
-use bandersnatch::Fr;
-use banderwagon::trait_impls::ops;
-use banderwagon::multi_scalar_mul;
+use ark_ff::{Zero, PrimeField};
+use banderwagon::{Fr, Element, multi_scalar_mul};
+use hex::encode;
 use ipa_multipoint::lagrange_basis::LagrangeBasis;
 use ipa_multipoint::crs::CRS;
 use jni::JNIEnv;
 use jni::objects::JClass;
 use jni::sys::{jbyteArray, jobjectArray, jsize};
+// use std::ascii::*;
+use core::ascii::*;
+use hex::FromHex;
+
+#[no_mangle]
+pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaMultipoint_pedersenHash(
+    env: JNIEnv,
+    _class: JClass,
+    input: jbyteArray,
+) -> jbyteArray {
+    // First, we have to get the byte[] out of java.
+    let mut ascii_bytes = env.convert_byte_array(input).unwrap();
+    let mut fixed_size_array: [u8; 128] = [0; 128];
+
+    fixed_size_array.copy_from_slice(&ascii_bytes);
+
+    // Now we create an address from this.
+    let mut address32 = [0u8; 32];
 
 
+    let mut merged_values: Vec<u8> = Vec::new();
+    // Iterate over pairs of elements and merge them into u8 values
+    for chunk in fixed_size_array.chunks(2) {
+        if chunk.len() == 2 {
+            let merged_byte = (chunk[0] << 4) | (chunk[1] & 0x0F);
+            merged_values.push(merged_byte);
+        }
+    }
+
+    address32.copy_from_slice(&merged_values[0..32]);
+
+    let mut trie_index= [0u8; 32];
+
+    trie_index.copy_from_slice(&merged_values[32..64]);
+
+    let mut result = pedersen_hash(&address32.to_vec(), &trie_index.to_vec());
+
+    // Turn result into [u8; 32] to [u8; 64]
+
+    let mut bra = [0u8; 32];
+
+    let mut ewq = Vec::from_hex("946352acd92aba2884d2b8746f44ae5fa1f61cc424af5c1a74c5c688862e2e48").unwrap();
+
+
+    // let qwe = "946352acd92aba2884d2b8746f44ae5fa1f61cc424af5c1a74c5c688862e2e48";
+    // for i in &str::chars(qwe) {
+    //     bra.push(i.to_digit(16).unwrap() as u8);
+    // }
+    // let q = "946352acd92aba2884d2b8746f44ae5fa1f61cc424af5c1a74c5c688862e2e48".as_bytes().to_vec();
+
+    // bra.copy_from_slice(&q);
+
+    // for
+    // result.clone().to_ascii_lowercase();
+    // let wqe = String::from_utf8(result.clone().to_ascii_lowercase()).unwrap();
+
+    let ew = result.clone();
+    
+    let mut re = String::from("");
+    for i in 0..32 {
+        let mut hex_string1 = format!("{:02x}", ew[i]);
+        re = format!("{}{}", &re, hex_string1.clone());
+    }
+
+    // let mut str1 = "946352acd92aba2884d2b8746f44ae5fa1f61cc424af5c1a74c5c688862e2e48";
+    // let mut str2 = re.as_str();
+    // assert_eq!(str1, re.as_str());
+    let iw = turn_str_to_bytes(re.as_str());
+
+    // assert_eq!(result.clone(), ewq.clone().as_slice());
+
+    let output = env.byte_array_from_slice(&iw).unwrap();
+    output
+}
+
+/// Pedersen hash receives an address and a trie index and returns a hash calculated this way:
+/// H(constant || address_low || address_high || trie_index_low || trie_index_high)
+/// where constant = 2 + 256*64
+/// address_low = first 16 bytes of the address
+/// address_high = last 16 bytes of the address
+/// trie_index_low = first 16 bytes of the trie index
+/// trie_index_high = last 16 bytes of the trie index
+/// The result is a 256 bit hash
+fn pedersen_hash(address_input : &Vec<u8>, trie_index_input : &Vec<u8>) -> [u8; 32] {
+    let constant = Fr::from(2u128 + 256u128*64u128);
+
+    let address_reference_to_vec: &Vec<u8> = &address_input;
+    let address: &[u8] = &*address_reference_to_vec;
+
+    let trie_index_reference_to_vec: &Vec<u8> = &trie_index_input;
+    let trie_index: &[u8] = &*trie_index_reference_to_vec;
+
+    // let address = "200000000000000000000000b794f5ea0ba39494ce839613fffba74279579268".as_bytes();
+    // let trie_index = "2000000000000000000000000000000000000000000000000000000000000001".as_bytes();
+
+    let address_low = Fr::from_le_bytes_mod_order(&address[0..16]);
+
+    let address_high = Fr::from_le_bytes_mod_order(&address[16..32]);
+
+    let trie_index_low = Fr::from_le_bytes_mod_order(&trie_index[0..16]);
+
+    let trie_index_high = Fr::from_le_bytes_mod_order(&trie_index[16..32]);
+
+    let scalars = vec![constant, address_low.clone(), address_high.clone(), trie_index_low.clone(), trie_index_high.clone()];
+
+    let bases = CRS::new(5, "eth_verkle_oct_2021".as_bytes());
+
+    // Compute the multi scalar multiplication. The result is a point in the banderwagon group.
+    let mut result = multi_scalar_mul(&bases.G, &scalars).to_bytes();
+    result.reverse();
+    return result;
+}
+
+fn turn_str_to_bytes(hex_string: &str) -> [u8; 64] {
+    // Create a vector to store the u8 integers
+    let mut u8_integers: Vec<u8> = Vec::new();
+
+    // Iterate over each character in the hexadecimal string
+
+    for hex_char in hex_string.chars() {
+        // Ensure the character is a valid hexadecimal digit
+        let mut hex_val = hex_char as u8;
+        u8_integers.push(hex_val);
+    }
+
+    let mut u8_array = [0u8; 64];
+
+    // Convert the vector into an array of u8 integers
+    u8_array.copy_from_slice(&u8_integers);
+
+    u8_array
+}
+
+
+// OLD CODE:
 
 // Seed used to compute the 256 pedersen generators
 // using try-and-increment
