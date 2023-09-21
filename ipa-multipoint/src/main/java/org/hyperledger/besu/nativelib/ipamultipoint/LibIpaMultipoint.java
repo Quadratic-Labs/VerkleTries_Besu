@@ -50,7 +50,7 @@ public class LibIpaMultipoint {
    * @param input polynomial elements
    * @return the coordinates of the projection of the polynomial on the curve
    */
-  public static native byte[] commit(byte[][] input);
+  public static native byte[] commit(byte[] input);
   public static native byte[] update_commitment();
 
   /**

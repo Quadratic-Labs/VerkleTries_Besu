@@ -5,6 +5,9 @@ import org.apache.tuweni.bytes.Bytes32;
 import org.apache.tuweni.units.bigints.UInt256;
 import org.hyperledger.besu.nativelib.ipamultipoint.LibIpaMultipoint;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 
 public class TrieKeyAdapter {
     private final UInt256 VERSION_LEAF_KEY = UInt256.valueOf(0);
@@ -17,7 +20,11 @@ public class TrieKeyAdapter {
     private final UInt256 VERKLE_NODE_WIDTH = UInt256.valueOf(256);
     private final UInt256 MAIN_STORAGE_OFFSET = UInt256.valueOf(256).pow(31);
 
-    public TrieKeyAdapter() {}
+    private Hasher<Bytes32> hasher;
+
+    public TrieKeyAdapter(Hasher<Bytes32> hasher) {
+        this.hasher = hasher;
+    }
 
     Bytes32 swapLastByte(Bytes32 base, UInt256 subIndex) {
         Bytes32 key = (Bytes32) Bytes.concatenate(base.slice(0, 31), Bytes.of(subIndex.toBytes().get(31)));
@@ -25,9 +32,18 @@ public class TrieKeyAdapter {
     }
 
     Bytes32 baseKey(Bytes32 address, UInt256 treeIndex) {
-        PedersenHash hasher = new PedersenHash();
-        Bytes32 hash = hasher.digest(Bytes.concatenate(address, treeIndex.toBytes().reverse()));
-        return hash;
+        int type_encoding = 2;
+        UInt256 encoding = UInt256.valueOf(type_encoding).add(VERKLE_NODE_WIDTH.multiply(UInt256.valueOf(16)));
+
+        Bytes32[] input = new Bytes32[] {
+            Bytes32.rightPad(encoding.toBytes().slice(16, 16).reverse()),
+            Bytes32.rightPad(address.slice(0, 16)),
+            Bytes32.rightPad(address.slice(16, 16)),
+            Bytes32.rightPad(treeIndex.toBytes().slice(16, 16).reverse()),
+            Bytes32.rightPad(treeIndex.toBytes().slice(0, 16).reverse())
+        };
+        Bytes32 key = hasher.commit(input);
+        return key;
     }
 
     public Bytes32 storageKey(Bytes32 address, UInt256 storageKey) {
