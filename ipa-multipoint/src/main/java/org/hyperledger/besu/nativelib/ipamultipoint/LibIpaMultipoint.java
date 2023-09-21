@@ -16,6 +16,7 @@
 package org.hyperledger.besu.nativelib.ipamultipoint;
 
 import com.sun.jna.Native;
+import org.apache.tuweni.bytes.Bytes32;
 
 import java.io.File;
 import java.io.IOException;
@@ -51,4 +52,11 @@ public class LibIpaMultipoint {
    */
   public static native byte[] commit(byte[][] input);
   public static native byte[] update_commitment();
+
+  /**
+   * Pedersen hash as specified in https://notes.ethereum.org/@vbuterin/verkle_tree_eip
+   * @param input Expects 64byte value as input encoded as byte[] e.g. "0x000..." <-> [48,48,48...] (48 is 0 in ASCII)
+   * @return 32bytes as byte[]  "0x000..." <-> [48,48,48...] (48 is 0 in ASCII)
+   */
+  public static native byte[] pedersenHash(byte[] input);
 }
