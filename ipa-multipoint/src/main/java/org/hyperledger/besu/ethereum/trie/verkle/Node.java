@@ -25,8 +25,7 @@ public interface Node<V> {
     Bytes32 EMPTY_HASH = Bytes32.ZERO;
 
     Node<V> accept(PathNodeVisitor<V> visitor, Bytes path);
-    // void accept(NodeVisitor<V> visitor);
-    // void accept(Bytes location, LocationNodeVisitor<V> visitor);
+    Node<V> accept(NodeVisitor<V> visitor);
 
     Bytes getPath();
 
@@ -38,11 +37,11 @@ public interface Node<V> {
 
     List<Node<V>> getChildren();
 
-    Bytes32 getHash();
+    Optional<Bytes32> getHash();
 
     Node<V> replacePath(Bytes path);
 
-    /** Marks the node as hash needs syncing */
+    /** Marks the node as needs to be persisted */
     void markDirty();
 
     /**

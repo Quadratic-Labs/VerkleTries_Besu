@@ -7,27 +7,42 @@ import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 
 public class LeafNode<V> implements Node<V>{
-    private final Optional<Bytes> location;
-    private final Bytes path;
+    private final Bytes location;
     protected final V value;
-    private Optional<Bytes32> hash = Optional.empty();
+    private final Bytes path;
+    private final Optional<Bytes32> hash;
     private boolean dirty = true;
 
     public LeafNode(
             final Bytes location,
+            final V value,
             final Bytes path,
-            final V value) {
-        this.location = Optional.ofNullable(location);
-        this.path = path;
+            final Optional<Bytes32> hash) {
+        this.location = location;
         this.value = value;
+        this.path = path;
+        this.hash = hash;
     }
 
     public LeafNode(
+            final Bytes location,
+            final V value,
             final Bytes path,
-            final V value) {
-        this.location = Optional.empty();
+            final Bytes32 hash) {
+        this.location = location;
+        this.value = value;
+        this.path = path;
+        this.hash = Optional.of(hash);
+    }
+
+    public LeafNode(
+            final Bytes location,
+            final V value,
+            final Bytes path) {
+        this.location = location;
         this.path = path;
         this.value = value;
+        hash = Optional.empty();
     }
 
     @Override
@@ -36,8 +51,18 @@ public class LeafNode<V> implements Node<V>{
     }
 
     @Override
+    public Node<V> accept(final NodeVisitor<V> visitor) {
+        return visitor.visit(this);
+    }
+
+    @Override
     public Optional<V> getValue() {
         return Optional.ofNullable(value);
+    }
+
+    @Override
+    public Optional<Bytes> getLocation() {
+        return Optional.of(location);
     }
 
     @Override
@@ -51,14 +76,17 @@ public class LeafNode<V> implements Node<V>{
     }
 
     @Override
-    public Bytes32 getHash() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getHash'");
+    public Optional<Bytes32> getHash() {
+        return hash;
+    }
+
+    public Node<V> replaceHash(Bytes32 hash) {
+        return new LeafNode<V>(location, value, path, hash);
     }
 
     @Override
     public Node<V> replacePath(Bytes path) {
-        LeafNode<V> updatedNode = new LeafNode<V>(location.get(), path, value);
+        LeafNode<V> updatedNode = new LeafNode<V>(location, value, path);
         return updatedNode;
     }
 

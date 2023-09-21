@@ -16,20 +16,13 @@ package org.hyperledger.besu.ethereum.trie.verkle;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 
 
-public class SimpleVerkleTrie<K extends Bytes, V> implements VerkleTrie<K, V> {
+public class SimpleVerkleTrie<K extends Bytes, V extends Bytes> implements VerkleTrie<K, V> {
     private Node<V> root;
 
     public SimpleVerkleTrie() {
@@ -43,25 +36,25 @@ public class SimpleVerkleTrie<K extends Bytes, V> implements VerkleTrie<K, V> {
     @Override
     public Optional<V> get(final K key) {
         checkNotNull(key);
-        return root.accept(new GetVisitor(), key).getValue();
+        return root.accept(new GetVisitor<V>(), key).getValue();
     }
 
     @Override
     public void put(final K key, final V value) {
         checkNotNull(key);
         checkNotNull(value);
-        this.root = root.accept(new PutVisitor(value), key);
+        this.root = root.accept(new PutVisitor<V>(value), key);
     }
 
     @Override
     public void remove(final K key) {
         checkNotNull(key);
-        this.root = root.accept(new RemoveVisitor(), key);
+        this.root = root.accept(new RemoveVisitor<V>(), key);
     }
 
     @Override
     public Bytes32 getRootHash() {
-        return root.getHash();
+        return root.accept(new HashVisitor<V>()).getHash().get();
     }
 
     @Override

@@ -36,15 +36,10 @@ public class NullNode<V> implements Node<V> {
         return visitor.visit(this, path);
     }
 
-    // @Override
-    // public void accept(final NodeVisitor<V> visitor) {
-    //     visitor.visit(this);
-    // }
-
-    // @Override
-    // public void accept(final Bytes location, final LocationNodeVisitor<V> visitor) {
-    //     visitor.visit(location, this);
-    // }
+    @Override
+    public Node<V> accept(final NodeVisitor<V> visitor) {
+        return visitor.visit(this);
+    }
 
     @Override
     public Bytes getPath() {
@@ -62,8 +57,8 @@ public class NullNode<V> implements Node<V> {
     }
 
     @Override
-    public Bytes32 getHash() {
-        return EMPTY_HASH;
+    public Optional<Bytes32> getHash() {
+        return Optional.of(EMPTY_HASH);
     }
 
     @Override

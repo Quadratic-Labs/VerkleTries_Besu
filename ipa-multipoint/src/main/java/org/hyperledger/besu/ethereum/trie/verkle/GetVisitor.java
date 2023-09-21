@@ -22,7 +22,6 @@ public class GetVisitor<V> implements PathNodeVisitor<V> {
     public Node<V> visit(LeafNode<V> leafNode, Bytes path) {
         final Bytes leafPath = leafNode.getPath();
         final Bytes commonPath = leafPath.commonPrefix(path);
-        System.err.println(String.format("leafPath %s, commonPath %s, path %s", leafPath, commonPath, path));
         if (commonPath.compareTo(leafPath) != 0) {
             return NULL_NODE_RESULT;
         }
