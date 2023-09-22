@@ -13,8 +13,6 @@
  */
 package org.hyperledger.besu.ethereum.trie.verkle;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 import org.apache.tuweni.bytes.Bytes;
@@ -39,21 +37,6 @@ public class NullNode<V> implements Node<V> {
     @Override
     public Node<V> accept(final NodeVisitor<V> visitor) {
         return visitor.visit(this);
-    }
-
-    @Override
-    public Bytes getPath() {
-        return Bytes.EMPTY;
-    }
-
-    @Override
-    public Optional<V> getValue() {
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Node<V>> getChildren() {
-        return Collections.emptyList();
     }
 
     @Override

@@ -31,7 +31,7 @@ public class PutVisitor<V> implements PathNodeVisitor<V> {
             final Bytes nodeSuffix) {
         final Node<V> updatedNode = node.replacePath(nodeSuffix.slice(1));
         // Should also add byte to location
-        BranchNode<V> newBranchNode = new BranchNode<V>(node.getLocation().get(), commonPath);
+        BranchNode<V> newBranchNode = new BranchNode<V>(node.getLocation(), commonPath);
         newBranchNode.replaceChild(nodeSuffix.get(0), updatedNode);
         final Node<V> insertedNode = newBranchNode.child(pathSuffix.get(0)).accept(this, pathSuffix.slice(1));
         newBranchNode.replaceChild(pathSuffix.get(0), insertedNode);
@@ -70,8 +70,7 @@ public class PutVisitor<V> implements PathNodeVisitor<V> {
         final Bytes pathSuffix = path.slice(commonPathLength);
         final Bytes nodeSuffix = nodePath.slice(commonPathLength);
         if (commonPath.compareTo(nodePath) == 0) {
-            final LeafNode<V> newNode = new LeafNode<V>(
-                leafNode.getLocation().orElse(Bytes.EMPTY), value, path);
+            final LeafNode<V> newNode = new LeafNode<V>(leafNode.getLocation(), value, path);
             newNode.markDirty();
             return newNode;
         }
@@ -81,11 +80,6 @@ public class PutVisitor<V> implements PathNodeVisitor<V> {
 
     @Override
     public Node<V> visit(final NullNode<V> nullNode, final Bytes path) {
-        final LeafNode<V> newNode = new LeafNode<V>(
-            nullNode.getLocation().orElse(Bytes.EMPTY),  // location
-            value,
-            path
-        );
-        return newNode;
+        return new LeafNode<V>(value, path);
     }
 }

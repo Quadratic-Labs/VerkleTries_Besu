@@ -7,14 +7,14 @@ import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 
 public class LeafNode<V> implements Node<V>{
-    private final Bytes location;
+    private final Optional<Bytes> location;
     protected final V value;
     private final Bytes path;
     private final Optional<Bytes32> hash;
     private boolean dirty = true;
 
     public LeafNode(
-            final Bytes location,
+            final Optional<Bytes> location,
             final V value,
             final Bytes path,
             final Optional<Bytes32> hash) {
@@ -25,23 +25,19 @@ public class LeafNode<V> implements Node<V>{
     }
 
     public LeafNode(
-            final Bytes location,
-            final V value,
-            final Bytes path,
-            final Bytes32 hash) {
-        this.location = location;
-        this.value = value;
-        this.path = path;
-        this.hash = Optional.of(hash);
-    }
-
-    public LeafNode(
-            final Bytes location,
+            final Optional<Bytes> location,
             final V value,
             final Bytes path) {
         this.location = location;
         this.path = path;
         this.value = value;
+        hash = Optional.empty();
+    }
+
+    public LeafNode(final V value, final Bytes path) {
+        location = Optional.empty();
+        this.value = value;
+        this.path = path;
         hash = Optional.empty();
     }
 
@@ -62,7 +58,7 @@ public class LeafNode<V> implements Node<V>{
 
     @Override
     public Optional<Bytes> getLocation() {
-        return Optional.of(location);
+        return location;
     }
 
     @Override
@@ -81,13 +77,12 @@ public class LeafNode<V> implements Node<V>{
     }
 
     public Node<V> replaceHash(Bytes32 hash) {
-        return new LeafNode<V>(location, value, path, hash);
+        return new LeafNode<V>(location, value, path, Optional.of(hash));
     }
 
     @Override
     public Node<V> replacePath(Bytes path) {
-        LeafNode<V> updatedNode = new LeafNode<V>(location, value, path);
-        return updatedNode;
+        return new LeafNode<V>(location, value, path, hash);
     }
 
     @Override

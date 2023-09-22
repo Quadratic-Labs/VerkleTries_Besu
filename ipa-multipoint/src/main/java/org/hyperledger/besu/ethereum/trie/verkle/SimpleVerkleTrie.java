@@ -54,7 +54,8 @@ public class SimpleVerkleTrie<K extends Bytes, V extends Bytes> implements Verkl
 
     @Override
     public Bytes32 getRootHash() {
-        return root.accept(new HashVisitor<V>()).getHash().get();
+        root = root.accept(new HashVisitor<V>(), root.getPath());
+        return root.getHash().get();
     }
 
     @Override

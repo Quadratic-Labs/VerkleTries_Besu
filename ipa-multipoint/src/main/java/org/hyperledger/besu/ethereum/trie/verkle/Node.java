@@ -14,6 +14,7 @@
  */
 package org.hyperledger.besu.ethereum.trie.verkle;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,21 +26,30 @@ public interface Node<V> {
     Bytes32 EMPTY_HASH = Bytes32.ZERO;
 
     Node<V> accept(PathNodeVisitor<V> visitor, Bytes path);
+
     Node<V> accept(NodeVisitor<V> visitor);
 
-    Bytes getPath();
+    default Bytes getPath() {
+        return Bytes.EMPTY;
+    };
 
     default Optional<Bytes> getLocation() {
         return Optional.empty();
     }
 
-    Optional<V> getValue();
+    default Optional<V> getValue() {
+        return Optional.empty();
+    };
 
-    List<Node<V>> getChildren();
-
-    Optional<Bytes32> getHash();
+    default Optional<Bytes32> getHash() {
+        return Optional.empty();
+    };
 
     Node<V> replacePath(Bytes path);
+
+    default List<Node<V>> getChildren() {
+        return Collections.emptyList();
+    }
 
     /** Marks the node as needs to be persisted */
     void markDirty();

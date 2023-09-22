@@ -13,7 +13,7 @@ public class BranchNode<V> implements Node<V> {
     @SuppressWarnings("rawtypes")
     protected static final Node NULL_NODE = NullNode.instance();
 
-    private final Bytes location;  // Location in the tree
+    private final Optional<Bytes> location;  // Location in the tree
     private final Bytes path;  // Extension path
     private final Optional<Bytes32> hash;  // vector commitment of children's commitments
     private List<Node<V>> children;
@@ -26,14 +26,14 @@ public class BranchNode<V> implements Node<V> {
             final Bytes path,
             final List<Node<V>> children) {
         assert (children.size() == maxChild());
-        this.location = location;
+        this.location = Optional.of(location);
         this.hash = Optional.of(hash);
         this.path = path;
         this.children = children;
     }
 
     public BranchNode(
-            final Bytes location,
+            final Optional<Bytes> location,
             final Optional<Bytes32> hash,
             final Bytes path,
             final List<Node<V>> children) {
@@ -45,7 +45,7 @@ public class BranchNode<V> implements Node<V> {
     }
 
     public BranchNode(
-            final Bytes location,
+            final Optional<Bytes> location,
             final Bytes path,
             final List<Node<V>> children) {
         assert (children.size() == maxChild());
@@ -55,7 +55,7 @@ public class BranchNode<V> implements Node<V> {
         hash = Optional.empty();
     }
 
-    public BranchNode(final Bytes location, final Bytes path) {
+    public BranchNode(final Optional<Bytes> location, final Bytes path) {
         this.location = location;
         this.path = path;
         this.children = new ArrayList<>();
@@ -97,11 +97,17 @@ public class BranchNode<V> implements Node<V> {
 
     @Override
     public Optional<Bytes> getLocation() {
-        return Optional.of(location);
+        return location;
     }
 
     public Bytes getPath() {
         return path;
+    }
+
+    @Override
+    public Node<V> replacePath(Bytes path) {
+        BranchNode<V> updatedNode = new BranchNode<V>(location, path, children);
+        return updatedNode;
     }
 
     @Override
@@ -112,12 +118,6 @@ public class BranchNode<V> implements Node<V> {
     @Override
     public List<Node<V>> getChildren() {
         return children;
-    }
-
-    @Override
-    public Node<V> replacePath(Bytes path) {
-        BranchNode<V> updatedNode = new BranchNode<V>(location, path, children);
-        return updatedNode;
     }
 
     @Override
