@@ -14,23 +14,49 @@ public class BranchNode<V> implements Node<V> {
     protected static final Node NULL_NODE = NullNode.instance();
 
     private final Optional<Bytes> location;  // Location in the tree
-    private final Bytes path;  // common children's trie-key prefix
-    private Optional<Bytes32> hash = Optional.empty();  // vector commitment of children's commitments
-    private boolean dirty = true;  // commitment out of sync
+    private final Bytes path;  // Extension path
+    private final Optional<Bytes32> hash;  // vector commitment of children's commitments
     private List<Node<V>> children;
+
+    private boolean dirty = true;  // not persisted
 
     public BranchNode(
             final Bytes location,
+            final Bytes32 hash,
             final Bytes path,
             final List<Node<V>> children) {
         assert (children.size() == maxChild());
-        this.location = Optional.ofNullable(location);
+        this.location = Optional.of(location);
+        this.hash = Optional.of(hash);
         this.path = path;
         this.children = children;
     }
 
-    public BranchNode(final Bytes location, final Bytes path) {
-        this.location = Optional.ofNullable(location);
+    public BranchNode(
+            final Optional<Bytes> location,
+            final Optional<Bytes32> hash,
+            final Bytes path,
+            final List<Node<V>> children) {
+        assert (children.size() == maxChild());
+        this.location = location;
+        this.hash = hash;
+        this.path = path;
+        this.children = children;
+    }
+
+    public BranchNode(
+            final Optional<Bytes> location,
+            final Bytes path,
+            final List<Node<V>> children) {
+        assert (children.size() == maxChild());
+        this.location = location;
+        this.path = path;
+        this.children = children;
+        hash = Optional.empty();
+    }
+
+    public BranchNode(final Optional<Bytes> location, final Bytes path) {
+        this.location = location;
         this.path = path;
         this.children = new ArrayList<>();
         for (int i = 0; i < maxChild(); i++) {
@@ -43,6 +69,16 @@ public class BranchNode<V> implements Node<V> {
         return 256;
     }
 
+    @Override
+    public Node<V> accept(PathNodeVisitor<V> visitor, Bytes path) {
+        return visitor.visit(this, path);
+    }
+
+    @Override
+    public Node<V> accept(final NodeVisitor<V> visitor) {
+        return visitor.visit(this);
+    }
+
     public Node<V> child(final byte childIndex) {
         return children.get(Byte.toUnsignedInt(childIndex));
     }
@@ -51,12 +87,17 @@ public class BranchNode<V> implements Node<V> {
         children.set(Byte.toUnsignedInt(index), childNode);
     }
 
-    public Bytes32 getHash() {
-        return hash.get();
+    public Optional<Bytes32> getHash() {
+        return hash;
     }
 
-    public void setHash(Bytes32 hash) {
-        this.hash = Optional.of(hash);
+    public Node<V> replaceHash(Bytes32 hash) {
+        return new BranchNode<V>(location, Optional.of(hash), path, children);
+    }
+
+    @Override
+    public Optional<Bytes> getLocation() {
+        return location;
     }
 
     public Bytes getPath() {
@@ -64,8 +105,9 @@ public class BranchNode<V> implements Node<V> {
     }
 
     @Override
-    public Node<V> accept(PathNodeVisitor<V> visitor, Bytes path) {
-        return visitor.visit(this, path);
+    public Node<V> replacePath(Bytes path) {
+        BranchNode<V> updatedNode = new BranchNode<V>(location, path, children);
+        return updatedNode;
     }
 
     @Override
@@ -76,12 +118,6 @@ public class BranchNode<V> implements Node<V> {
     @Override
     public List<Node<V>> getChildren() {
         return children;
-    }
-
-    @Override
-    public Node<V> replacePath(Bytes path) {
-        BranchNode<V> updatedNode = new BranchNode<V>(location.get(), path, children);
-        return updatedNode;
     }
 
     @Override
