@@ -184,15 +184,13 @@ public class SimpleVerkleTrieTest {
         Bytes32 key3 = Bytes32.fromHexString("0x00ff112233445566778899aabbccddeeff00112233445566778899aabbccddff");
         Bytes32 value3 = Bytes32.fromHexString("0x0300000000000000000000000000000000000000000000000000000000000000");
         byte index1 = key1.get(1);
-        byte index2 = key1.get(1);
         trie.put(key1, value1);
         trie.put(key2, value2);
         trie.put(key3, value3);
         Node<Bytes32> root = trie.getRoot();
         assertThat(root).as("Many values trie's root is a BranchNode").isInstanceOf(BranchNode.class);
         BranchNode<Bytes32> branchRoot = (BranchNode<Bytes32>) root;
-        assertThat(branchRoot.child(index1)).as("Child at index of first key is a NullNode").isInstanceOf(LeafNode.class);
-        assertThat(branchRoot.child(index2)).as("Child at index of first key is a NullNode").isInstanceOf(LeafNode.class);
+        assertThat(branchRoot.child(index1)).as("Child at index of first key is a LeafNode").isInstanceOf(LeafNode.class);
         trie.remove(key3);
         assertThat(trie.get(key3)).as("Make sure value is deleted").isEqualTo(Optional.empty());
         assertThat(trie.get(key2)).as("Retrieve second value").isEqualTo(Optional.of(value2));
@@ -201,5 +199,6 @@ public class SimpleVerkleTrieTest {
         assertThat(trie.get(key1)).as("Retrieve first value").isEqualTo(Optional.of(value1));
         trie.remove(key1);
         assertThat(trie.get(key1)).as("Make sure value is deleted").isEqualTo(Optional.empty());
+        assertThat(branchRoot.child(index1)).as("Child at index of first key is a NullNode").isInstanceOf(NullNode.class);
     }
 }
