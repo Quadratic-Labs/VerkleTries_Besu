@@ -13,20 +13,8 @@ public class RemoveVisitor<V> implements PathNodeVisitor<V> {
         }
         final Bytes pathSuffix = path.slice(commonPath.size());
         final byte childIndex = pathSuffix.get(0);
-        Node<V> childNode = branchNode.child(childIndex);
-        if (childNode instanceof LeafNode) {
-            // It's a LeafNode, cast it to LeafNode
-            childNode = visit((LeafNode<V>) childNode, pathSuffix.slice(1));
-            branchNode.replaceChild(childIndex, childNode);
-        } else if (childNode instanceof BranchNode) {
-            // It's a BranchNode, cast it to BranchNode
-            childNode = visit((BranchNode<V>) childNode, pathSuffix.slice(1));
-            branchNode.replaceChild(childIndex, childNode);
-        } else {
-            // It's a NullNode, cast it to NullNode
-            childNode = visit((NullNode<V>) childNode, pathSuffix.slice(1));
-            branchNode.replaceChild(childIndex, childNode);
-        }
+        final Node<V> chilNode = branchNode.child(childIndex).accept(this, pathSuffix.slice(1));
+        branchNode.replaceChild(childIndex, chilNode);
         return branchNode;
     }
 
