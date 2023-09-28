@@ -4,6 +4,7 @@ import org.apache.tuweni.bytes.Bytes;
 
 public class RemoveVisitor<V> implements PathNodeVisitor<V> {
     private final Node<V> NULL_NODE_RESULT = NullNode.instance();
+
     @Override
     public Node<V> visit(BranchNode<V> branchNode, Bytes path) {
         final Bytes leafPath = branchNode.getPath();
@@ -32,5 +33,5 @@ public class RemoveVisitor<V> implements PathNodeVisitor<V> {
     public Node<V> visit(NullNode<V> nullNode, Bytes path) {
         return NULL_NODE_RESULT;
     }
-    
+
 }
