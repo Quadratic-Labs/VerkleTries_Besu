@@ -111,11 +111,6 @@ public class BranchNode<V> implements Node<V> {
     }
 
     @Override
-    public Optional<V> getValue() {
-        return Optional.empty();
-    }
-
-    @Override
     public List<Node<V>> getChildren() {
         return children;
     }
