@@ -50,7 +50,8 @@ public class CommitVisitor<V> implements PathNodeVisitor<V> {
         if (!leafNode.isDirty()) {
             return leafNode;
         }
-        nodeUpdater.store(location, null, valueSerialiser.apply(leafNode.getValue().get()));
+        Bytes extendedLocation = Bytes.concatenate(location, leafNode.getPath());
+        nodeUpdater.store(extendedLocation, null, valueSerialiser.apply(leafNode.getValue().get()));
         return leafNode;
     }
 
