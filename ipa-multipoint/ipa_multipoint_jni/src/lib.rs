@@ -73,3 +73,37 @@ pub(crate) fn hash_addr_int(addr: &[u8; 32], integer: &[u8; 32]) -> H256 {
 
     hash64(hash_input)
 }
+
+#[no_mangle]
+pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaMultipoint_commit(env: JNIEnv,
+                                                                                                 _class: JClass<'_>,
+                                                                                                 input: jbyteArray)
+                                                                                                 -> jbyteArray {
+    // Input should be a multiple of 32-be-bytes.
+    let inp = env.convert_byte_array(input).expect("Cannot convert jbyteArray to rust array");
+
+    let len = inp.len();
+    if len % 32 != 0 {
+        env.throw_new("java/lang/IllegalArgumentException", "Invalid input length. Should be a multiple of 32-bytes.")
+           .expect("Failed to throw exception");
+        return std::ptr::null_mut(); // Return null pointer to indicate an error
+    }    
+    let n_scalars = len / 32;
+    if n_scalars > 256 {
+        env.throw_new("java/lang/IllegalArgumentException", "Invalid input length. Should be at most 256 elements of 32-bytes.")
+           .expect("Failed to throw exception");
+        return std::ptr::null_mut(); // Return null pointer to indicate an error
+    }    
+
+    // Each 32-be-bytes are interpreted as field elements.
+    let mut scalars: Vec<Fr> = Vec::with_capacity(n_scalars);
+    for b in inp.chunks(32) {
+        scalars.push(Fr::from_be_bytes_mod_order(b));
+    }
+
+    // Committing all values at once.
+    let bases = CRS::new(n_scalars, PEDERSEN_SEED);
+    let mut commit = multi_scalar_mul(&bases.G, &scalars).to_bytes();
+    commit.reverse();
+    return env.byte_array_from_slice(&commit).expect("Couldn't convert to byte array");
+}
