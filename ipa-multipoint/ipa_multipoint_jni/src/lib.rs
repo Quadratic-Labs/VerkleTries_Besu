@@ -63,7 +63,7 @@ pub(crate) fn hash_addr_int(addr: &[u8; 32], integer: &[u8; 32]) -> H256 {
 
     let address_bytes = addr;
 
-    let mut integer_bytes = integer;
+    let integer_bytes = integer;
     let mut hash_input = [0u8; 64];
     let (first_half, second_half) = hash_input.split_at_mut(32);
 
