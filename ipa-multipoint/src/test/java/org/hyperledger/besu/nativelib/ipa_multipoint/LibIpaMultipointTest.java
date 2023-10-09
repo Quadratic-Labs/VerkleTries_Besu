@@ -63,11 +63,10 @@ public class LibIpaMultipointTest {
     @Test
     public void testCallLibraryPedersenHash() {
         // Example of passing address and trieIndex to pedersenHash.
-        Bytes32 address = Bytes32.fromHexString("0x000000000000000000000000b794f5ea0ba39494ce839613fffba74279579268");
-        Bytes32 trieIndex = Bytes32.fromHexString("0x0000000000000000000000000000000000000000000000000000000000000001");
-        byte[] total = Bytes.wrap(address,trieIndex).toArray();
+        Bytes32 address = Bytes32.fromHexString("0xed3f9549040250ec5cdef31947e5213edee80ad2d5bba35c9e48246c5d9213d6");
+        Bytes32 trieIndex = Bytes32.fromHexString("0x1C4C6CE0115457AC1AB82968749EB86ED2D984743D609647AE88299989F91271");
+        byte[] total = Bytes.wrap(address, trieIndex).toArray();
         Bytes result = Bytes.of(LibIpaMultipoint.pedersenHash(total));
-
-        assertThat(result).isEqualTo(Bytes32.fromHexString("0x0c8ca4aa6d74880db2c2bf3adfae2ac9cf01ebeb590403293d9c70aa07c3090a"));
+        assertThat(result).isEqualTo(Bytes32.fromHexString("0x2e50716b7d8c6d13d6005ea248f63f5a11ed63318cad38010f4bcb9a9c2e8b43"));
     }
 }
