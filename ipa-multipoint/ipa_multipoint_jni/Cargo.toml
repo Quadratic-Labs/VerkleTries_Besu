@@ -22,6 +22,7 @@ repository = "https://github.com/hyperledger/besu-native"
 edition = "2018"
 
 [dependencies]
+verkle-spec = { git = "https://github.com/crate-crypto/rust-verkle", branch = "master" }
 ipa-multipoint = { git = "https://github.com/crate-crypto/ipa_multipoint", branch = "banderwagon_migration" }
 banderwagon = { git = "https://github.com/crate-crypto/banderwagon" }
 bandersnatch = "0.1.1"
