@@ -16,6 +16,11 @@ use ark_ff::PrimeField;
 use banderwagon::{Fr, multi_scalar_mul};
 use ipa_multipoint::crs::CRS;
 use verkle_spec::*;
+// use crate::{vergroup_to_field};
+use ark_serialize::CanonicalSerialize;
+use verkle_trie::*;
+
+// use group_to_field;
 
 use jni::JNIEnv;
 use jni::objects::JClass;
@@ -103,7 +108,24 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
 
     // Committing all values at once.
     let bases = CRS::new(n_scalars, PEDERSEN_SEED);
-    let mut commit = multi_scalar_mul(&bases.G, &scalars).to_bytes();
-    commit.reverse();
-    return env.byte_array_from_slice(&commit).expect("Couldn't convert to byte array");
+    let mut commit = multi_scalar_mul(&bases.G, &scalars);
+
+
+    let mut base_field = commit.map_to_field();
+
+    let mut bytes = [0u8; 32];
+    base_field
+        .serialize(&mut bytes[..])
+        .expect("could not serialise point into a 32 byte array");
+    let mut scalarField = Fr::from_le_bytes_mod_order(&bytes);
+
+    let returnBytes = scalarField;
+
+    let mut bytes2 = [0u8; 32];
+    returnBytes
+        .serialize(&mut bytes2[..])
+        .expect("could not serialise field into a 32 byte array");
+
+    assert_eq!(bytes2, bytes);
+    return env.byte_array_from_slice(&bytes2).expect("Couldn't convert to byte array");
 }
