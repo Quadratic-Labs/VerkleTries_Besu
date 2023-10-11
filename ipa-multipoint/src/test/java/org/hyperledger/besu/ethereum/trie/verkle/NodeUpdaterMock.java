@@ -5,7 +5,7 @@ import java.util.HashMap;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 
-public class NodeUpdaterMock<V extends Bytes> implements NodeUpdater {
+public class NodeUpdaterMock implements NodeUpdater {
 
     public HashMap<Bytes, Bytes> storage;
     

@@ -47,6 +47,10 @@ public interface Node<V> {
 
     Node<V> replacePath(Bytes path);
 
+    default Bytes getEncodedValue() {
+        return Bytes.EMPTY;
+    }
+
     default List<Node<V>> getChildren() {
         return Collections.emptyList();
     }

@@ -14,19 +14,14 @@
  */
 package org.hyperledger.besu.ethereum.trie.verkle;
 
-import java.util.function.Function;
-
 import org.apache.tuweni.bytes.Bytes;
-
 
 public class CommitVisitor<V> implements PathNodeVisitor<V> {
 
     protected final NodeUpdater nodeUpdater;
-    protected final Function<V, Bytes> valueSerialiser;
 
-    public CommitVisitor(final NodeUpdater nodeUpdater, final Function<V, Bytes> valueSerialiser) {
+    public CommitVisitor(final NodeUpdater nodeUpdater) {
         this.nodeUpdater = nodeUpdater;
-        this.valueSerialiser = valueSerialiser;
     }
 
     @Override
@@ -34,14 +29,12 @@ public class CommitVisitor<V> implements PathNodeVisitor<V> {
         if (!branchNode.isDirty()) {
             return branchNode;
         }
-        Bytes extendedLocation = Bytes.concatenate(location, branchNode.getPath());
-
-        for (int i = 0; i < branchNode.maxChild(); ++i) {
+        for (int i = 0; i < BranchNode.maxChild(); ++i) {
             Bytes index = Bytes.of(i);
             final Node<V> child = branchNode.child((byte) i);
-            child.accept(this, Bytes.concatenate(extendedLocation, index));
+            child.accept(this, Bytes.concatenate(location, index));
         }
-        nodeUpdater.store(location, null, (Bytes) branchNode.getHash().get());
+        nodeUpdater.store(location, null, branchNode.getEncodedValue());
         return branchNode;
     }
 
@@ -50,8 +43,7 @@ public class CommitVisitor<V> implements PathNodeVisitor<V> {
         if (!leafNode.isDirty()) {
             return leafNode;
         }
-        Bytes extendedLocation = Bytes.concatenate(location, leafNode.getPath());
-        nodeUpdater.store(extendedLocation, null, valueSerialiser.apply(leafNode.getValue().get()));
+        nodeUpdater.store(location, null, leafNode.getEncodedValue());
         return leafNode;
     }
 

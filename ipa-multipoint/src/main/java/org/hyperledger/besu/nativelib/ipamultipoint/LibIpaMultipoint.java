@@ -16,7 +16,6 @@
 package org.hyperledger.besu.nativelib.ipamultipoint;
 
 import com.sun.jna.Native;
-import org.apache.tuweni.bytes.Bytes32;
 
 import java.io.File;
 import java.io.IOException;
