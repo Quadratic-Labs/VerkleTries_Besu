@@ -3,10 +3,6 @@ package org.hyperledger.besu.ethereum.trie.verkle;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 import org.apache.tuweni.units.bigints.UInt256;
-import org.hyperledger.besu.nativelib.ipamultipoint.LibIpaMultipoint;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 
 public class TrieKeyAdapter {

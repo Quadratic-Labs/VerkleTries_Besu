@@ -17,7 +17,6 @@ package org.hyperledger.besu.ethereum.trie.verkle;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
@@ -25,10 +24,13 @@ import org.apache.tuweni.bytes.Bytes32;
 
 public class SimpleVerkleTrie<K extends Bytes, V extends Bytes> implements VerkleTrie<K, V> {
     private Node<V> root;
-    final private Function<V, Bytes> valueSerialiser = a -> (Bytes) a;
 
     public SimpleVerkleTrie() {
         this.root = NullNode.instance();
+    }
+
+    public SimpleVerkleTrie(Node<V> root) {
+        this.root = root;
     }
 
     public Node<V> getRoot() {
@@ -68,6 +70,6 @@ public class SimpleVerkleTrie<K extends Bytes, V extends Bytes> implements Verkl
     @Override
     public void commit(final NodeUpdater nodeUpdater) {
         root = root.accept(new HashVisitor<V>(), root.getPath());
-        root = root.accept(new CommitVisitor<V>(nodeUpdater, valueSerialiser), Bytes.EMPTY);
+        root = root.accept(new CommitVisitor<V>(nodeUpdater), Bytes.EMPTY);
     }
 }

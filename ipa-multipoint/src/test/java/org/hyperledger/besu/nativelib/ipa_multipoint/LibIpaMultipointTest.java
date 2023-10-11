@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.*;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 import org.hyperledger.besu.nativelib.ipamultipoint.LibIpaMultipoint;
-import java.util.Arrays;
 
 
 public class LibIpaMultipointTest {

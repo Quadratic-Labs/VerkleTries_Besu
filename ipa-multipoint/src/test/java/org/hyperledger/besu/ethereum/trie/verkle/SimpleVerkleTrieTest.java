@@ -115,8 +115,6 @@ public class SimpleVerkleTrieTest {
         Bytes32 value1 = Bytes32.fromHexString("0x1000000000000000000000000000000000000000000000000000000000000001");
         Bytes32 key2 = Bytes32.fromHexString("0x00112233445566778899aabbccddeeff00112233445566778899aabbccddee00");
         Bytes32 value2 = Bytes32.fromHexString("0x0100000000000000000000000000000000000000000000000000000000000002");
-        byte index1 = key1.get(31);
-        byte index2 = key2.get(31);
         trie.put(key1, value1);
         trie.put(key2, value2);
         trie.remove(key1);
@@ -134,8 +132,6 @@ public class SimpleVerkleTrieTest {
         Bytes32 value1 = Bytes32.fromHexString("0x1000000000000000000000000000000000000000000000000000000000000000");
         Bytes32 key2 = Bytes32.fromHexString("0xff112233445566778899aabbccddeeff00112233445566778899aabbccddee00");
         Bytes32 value2 = Bytes32.fromHexString("0x0100000000000000000000000000000000000000000000000000000000000000");
-        byte index1 = key1.get(0);
-        byte index2 = key2.get(0);
         trie.put(key1, value1);
         trie.put(key2, value2);
         trie.remove(key1);
@@ -153,8 +149,6 @@ public class SimpleVerkleTrieTest {
         Bytes32 value1 = Bytes32.fromHexString("0x1000000000000000000000000000000000000000000000000000000000000000");
         Bytes32 key2 = Bytes32.fromHexString("0x00ff112233445566778899aabbccddeeff00112233445566778899aabbccddee");
         Bytes32 value2 = Bytes32.fromHexString("0x0100000000000000000000000000000000000000000000000000000000000000");
-        byte index1 = key1.get(1);
-        byte index2 = key2.get(1);
         trie.put(key1, value1);
         trie.put(key2, value2);
         trie.remove(key1);
