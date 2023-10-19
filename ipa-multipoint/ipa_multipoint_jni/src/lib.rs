@@ -12,7 +12,8 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  */
-use ark_ff::PrimeField;
+use ark_ff::{PrimeField, BigInteger128, BigInteger256, BigInteger};
+use ark_std::Zero;
 use banderwagon::{Fr, multi_scalar_mul};
 use ipa_multipoint::crs::CRS;
 use verkle_spec::*;
@@ -25,6 +26,9 @@ use verkle_trie::*;
 use jni::JNIEnv;
 use jni::objects::JClass;
 use jni::sys::jbyteArray;
+use verkle_trie::from_to_bytes::FromBytes;
+use num_bigint::BigUint;
+
 
 // Copied from rust-verkle: https://github.com/crate-crypto/rust-verkle/blob/581200474327f5d12629ac2e1691eff91f944cec/verkle-trie/src/constants.rs#L12
 const PEDERSEN_SEED: &'static [u8] = b"eth_verkle_oct_2021";
@@ -79,6 +83,9 @@ pub(crate) fn hash_addr_int(addr: &[u8; 32], integer: &[u8; 32]) -> H256 {
     hash64(hash_input)
 }
 
+/// Commit receives a list of 32 byte scalars and returns a 32 byte scalar
+/// Scalar is actually the map_to_field(commitment) because we want to reuse the commitment in parent node.
+/// This is ported from rust-verkle.
 #[no_mangle]
 pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaMultipoint_commit(env: JNIEnv,
                                                                                                  _class: JClass<'_>,
@@ -102,30 +109,43 @@ pub extern "system" fn Java_org_hyperledger_besu_nativelib_ipamultipoint_LibIpaM
 
     // Each 32-be-bytes are interpreted as field elements.
     let mut scalars: Vec<Fr> = Vec::with_capacity(n_scalars);
+
     for b in inp.chunks(32) {
         scalars.push(Fr::from_be_bytes_mod_order(b));
     }
 
+    
     // Committing all values at once.
     let bases = CRS::new(n_scalars, PEDERSEN_SEED);
-    let mut commit = multi_scalar_mul(&bases.G, &scalars);
+
+    let commit = multi_scalar_mul(&bases.G, &scalars);
 
 
-    let mut base_field = commit.map_to_field();
+    let scalar = group_to_field(&commit);
+
+
+    let mut scalar_bytes = [0u8; 32];
+
+    scalar.serialize(&mut scalar_bytes[..]).expect("could not serialise Fr into a 32 byte array");
+
+    scalar_bytes.reverse();
+
+
+    return env.byte_array_from_slice(&scalar_bytes).expect("Couldn't convert to byte array");
+}
+
+
+// Note: This is a 2 to 1 map, but the two preimages are identified to be the same
+// TODO: Create a document showing that this poses no problems
+pub(crate)fn group_to_field(point: &Element) -> Fr {
+    use ark_ff::PrimeField;
+    use ark_serialize::CanonicalSerialize;
+
+    let base_field = point.map_to_field();
 
     let mut bytes = [0u8; 32];
     base_field
         .serialize(&mut bytes[..])
         .expect("could not serialise point into a 32 byte array");
-    let mut scalarField = Fr::from_le_bytes_mod_order(&bytes);
-
-    let returnBytes = scalarField;
-
-    let mut bytes2 = [0u8; 32];
-    returnBytes
-        .serialize(&mut bytes2[..])
-        .expect("could not serialise field into a 32 byte array");
-
-    assert_eq!(bytes2, bytes);
-    return env.byte_array_from_slice(&bytes2).expect("Couldn't convert to byte array");
+    Fr::from_le_bytes_mod_order(&bytes)
 }
