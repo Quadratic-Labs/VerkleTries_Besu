@@ -1,16 +1,22 @@
 package org.hyperledger.besu.ethereum.trie.verkle;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
+import org.apache.tuweni.rlp.RLP;
+import org.apache.tuweni.rlp.RLPWriter;
 
 public class LeafNode<V> implements Node<V>{
     private final Optional<Bytes> location;
     protected final V value;
     private final Bytes path;
     private final Optional<Bytes32> hash;
+    private Optional<Bytes> encodedValue = Optional.empty();
+    private final Function<V, Bytes> valueSerializer;
     private boolean dirty = true;
 
     public LeafNode(
@@ -22,6 +28,7 @@ public class LeafNode<V> implements Node<V>{
         this.value = value;
         this.path = path;
         this.hash = hash;
+        this.valueSerializer = val -> (Bytes) val;
     }
 
     public LeafNode(
@@ -31,7 +38,8 @@ public class LeafNode<V> implements Node<V>{
         this.location = location;
         this.path = path;
         this.value = value;
-        hash = Optional.empty();
+        this.hash = Optional.empty();
+        this.valueSerializer = val -> (Bytes) val;
     }
 
     public LeafNode(final V value, final Bytes path) {
@@ -39,6 +47,7 @@ public class LeafNode<V> implements Node<V>{
         this.value = value;
         this.path = path;
         hash = Optional.empty();
+        this.valueSerializer = val -> (Bytes) val;
     }
 
     @Override
@@ -83,6 +92,18 @@ public class LeafNode<V> implements Node<V>{
     @Override
     public Node<V> replacePath(Bytes path) {
         return new LeafNode<V>(location, value, path, hash);
+    }
+
+    @Override
+    public Bytes getEncodedValue() {
+        if (encodedValue.isPresent()) {
+            return encodedValue.get();
+        }
+        Bytes encodedVal = getValue().isPresent() ? valueSerializer.apply(getValue().get()) : Bytes.EMPTY;
+        List<Bytes> values = Arrays.asList(Bytes.EMPTY, getPath(), encodedVal);
+        Bytes result = RLP.encodeList(values, RLPWriter::writeValue);
+        this.encodedValue = Optional.of(result);
+        return result;
     }
 
     @Override

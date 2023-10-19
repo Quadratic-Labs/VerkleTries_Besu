@@ -29,6 +29,10 @@ public class SimpleVerkleTrie<K extends Bytes, V extends Bytes> implements Verkl
         this.root = NullNode.instance();
     }
 
+    public SimpleVerkleTrie(Node<V> root) {
+        this.root = root;
+    }
+
     public Node<V> getRoot() {
         return root;
     }
@@ -65,6 +69,7 @@ public class SimpleVerkleTrie<K extends Bytes, V extends Bytes> implements Verkl
 
     @Override
     public void commit(final NodeUpdater nodeUpdater) {
-        // Nothing to do here
+        root = root.accept(new HashVisitor<V>(), root.getPath());
+        root = root.accept(new CommitVisitor<V>(nodeUpdater), Bytes.EMPTY);
     }
 }

@@ -3,7 +3,6 @@ package org.hyperledger.besu.ethereum.trie.verkle;
 import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.*;
 
-import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 import org.apache.tuweni.units.bigints.UInt256;
 

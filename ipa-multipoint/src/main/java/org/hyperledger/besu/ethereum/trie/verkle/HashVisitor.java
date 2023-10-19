@@ -19,7 +19,7 @@ public class HashVisitor<V extends Bytes> implements PathNodeVisitor<V> {
         if (location.size() == 31) {  // branch with leaf nodes as children
             baseHash = hashValues(branchNode, location);
         } else {  // Regular internal node
-            int size = branchNode.maxChild();
+            int size = BranchNode.maxChild();
             Bytes32[] childCommits = new Bytes32[size];
             for (int i = 0; i < size; i++) {
                 byte index = (byte) i;
@@ -131,7 +131,7 @@ public class HashVisitor<V extends Bytes> implements PathNodeVisitor<V> {
         // Values are decomposed into 16 lower bytes and 16 higher bytes
         // Lower bytes are appended with a 1 to signify that a value is present
         // Each part is hashed separately
-        int size = branchNode.maxChild();
+        int size = BranchNode.maxChild();
         Bytes32[] values = new Bytes32[size * 2];
         for (int i = 0; i < size; i++) {
             Optional<V> value = branchNode.child((byte) i).getValue();

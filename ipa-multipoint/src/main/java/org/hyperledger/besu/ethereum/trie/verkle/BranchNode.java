@@ -2,20 +2,21 @@ package org.hyperledger.besu.ethereum.trie.verkle;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
 
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
+import org.apache.tuweni.rlp.RLP;
+import org.apache.tuweni.rlp.RLPWriter;
 
 
 public class BranchNode<V> implements Node<V> {
-    @SuppressWarnings("rawtypes")
-    protected static final Node NULL_NODE = NullNode.instance();
-
     private final Optional<Bytes> location;  // Location in the tree
     private final Bytes path;  // Extension path
     private final Optional<Bytes32> hash;  // vector commitment of children's commitments
+    private Optional<Bytes> encodedValue = Optional.empty();
     private List<Node<V>> children;
 
     private boolean dirty = true;  // not persisted
@@ -60,12 +61,12 @@ public class BranchNode<V> implements Node<V> {
         this.path = path;
         this.children = new ArrayList<>();
         for (int i = 0; i < maxChild(); i++) {
-            children.add(NULL_NODE);
+            children.add(NullNode.instance());
         }
         hash = Optional.of(EMPTY_HASH);
     }
 
-    public int maxChild() {
+    public static int maxChild() {
         return 256;
     }
 
@@ -111,8 +112,14 @@ public class BranchNode<V> implements Node<V> {
     }
 
     @Override
-    public Optional<V> getValue() {
-        return Optional.empty();
+    public Bytes getEncodedValue() {
+        if (encodedValue.isPresent()) {
+            return encodedValue.get();
+        }
+        List<Bytes> values = Arrays.asList((Bytes) getHash().get(), getPath());
+        Bytes result = RLP.encodeList(values, RLPWriter::writeValue);
+        this.encodedValue = Optional.of(result);
+        return result;
     }
 
     @Override
