@@ -44,13 +44,19 @@ public class LibIpaMultipoint {
   }
 
   /**
-   * Evaluates a polynomial of degree 3 (uniquely defined by 4 values) at a specific point on the curve.
+   * Evaluates a polynomial of degree 255 (uniquely defined by 256 values) at a specific point on the curve.
 
-   * @param input polynomial elements
-   * @return the coordinates of the projection of the polynomial on the curve
+   * @param input [Fr,Fr,Fr...]
+   * @return group_to_field(commitment)
    */
   public static native byte[] commit(byte[] input);
-  public static native byte[] update_commitment();
+
+  /**
+   * Evaluates a polynomial of degree 255 (uniquely defined by 256 values) at a specific point on the curve.
+   * @param input [Fr,Fr,Fr...]
+   * @return commitment.to_bytes()
+   */
+  public static native byte[] commit_root(byte[] input);
 
   /**
    * Pedersen hash as specified in https://notes.ethereum.org/@vbuterin/verkle_tree_eip

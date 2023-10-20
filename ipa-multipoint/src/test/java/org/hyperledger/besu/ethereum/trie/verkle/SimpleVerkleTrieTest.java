@@ -26,7 +26,7 @@ public class SimpleVerkleTrieTest {
         Node<Bytes32> root = trie.getRoot();
         assertThat(root).as("One value trie's root is a LeafNode").isInstanceOf(LeafNode.class);
         assertThat(trie.get(key)).as("Get one value should be the inserted value").isEqualTo(Optional.of(value));
-        Bytes32 expectedRootHash = Bytes32.fromHexString("0x289e25e55afdbe1ebd1353807b957cd394db172b847689b1063dc2c4fa609a40");
+        Bytes32 expectedRootHash = Bytes32.fromHexString("0x0919cd252910ea715338943554cdf800fe9b951f47182f8d7ae5be9ce4f5ec65");
         assertThat(trie.getRootHash()).as("Retrieve root hash").isEqualByComparingTo(expectedRootHash);
     }
 
@@ -52,7 +52,7 @@ public class SimpleVerkleTrieTest {
         assertThat(branchRoot.getPath()).as("Path is the common stem").isEqualTo(path);
         assertThat(trie.get(key1)).as("Retrieve first value").isEqualTo(Optional.of(value1));
         assertThat(trie.get(key2)).as("Retrieve second value").isEqualTo(Optional.of(value2));
-        Bytes32 expectedRootHash = Bytes32.fromHexString("0x1b63fa7a4cf89641f1d25b5b5a797ad7a2f044ad09c2146f391aa9e99834b422");
+        Bytes32 expectedRootHash = Bytes32.fromHexString("0x0664595728997574720abefebd044352ab20b353f5c8bdb5558d1f17d71d171c");
         assertThat(trie.getRootHash()).as("Retrieve root hash").isEqualByComparingTo(expectedRootHash);
     }
 
@@ -78,7 +78,7 @@ public class SimpleVerkleTrieTest {
         assertThat(branchRoot.getPath()).as("Path is the common stem").isEqualTo(path);
         assertThat(trie.get(key1)).as("Retrieve first value").isEqualTo(Optional.of(value1));
         assertThat(trie.get(key2)).as("Retrieve second value").isEqualTo(Optional.of(value2));
-        Bytes32 expectedRootHash = Bytes32.fromHexString("0xe4401afe4633dfb30f59af08b4c6157ff740ff5230a1d96ddf2dcf2c4590724c");
+        Bytes32 expectedRootHash = Bytes32.fromHexString("0x18344e51ea6f0699b227f8a00871547430aebba457d4f7d0830315e7b683bba1");
         assertThat(trie.getRootHash()).as("Retrieve root hash").isEqualByComparingTo(expectedRootHash);
     }
 
@@ -104,7 +104,7 @@ public class SimpleVerkleTrieTest {
         assertThat(branchRoot.getPath()).as("Path is the common stem").isEqualTo(path);
         assertThat(trie.get(key1)).as("Retrieve first value").isEqualTo(Optional.of(value1));
         assertThat(trie.get(key2)).as("Retrieve second value").isEqualTo(Optional.of(value2));
-        Bytes32 expectedRootHash = Bytes32.fromHexString("0xa8143932b0cfbcb0b0d1ddea2d957796b3794425950f95cc44917d065f155a53");
+        Bytes32 expectedRootHash = Bytes32.fromHexString("0x0c0f178f291e1113c56903cfcfd7023e64550058127d8de4995461760262a7be");
         assertThat(trie.getRootHash()).as("Retrieve root hash").isEqualByComparingTo(expectedRootHash);
     }
 
