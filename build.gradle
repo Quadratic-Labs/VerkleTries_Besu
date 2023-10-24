@@ -21,12 +21,10 @@ buildscript {
 
 plugins {
     id 'maven-publish'
-    id 'com.jfrog.bintray' version '1.8.5'
 }
 
 allprojects {
   apply plugin: 'java-library'
-  apply plugin: 'com.jfrog.bintray'
   apply plugin: 'maven-publish'
 
   sourceCompatibility = 17
@@ -42,9 +40,12 @@ allprojects {
   publishing {
     publications {
       mavenJava(MavenPublication) {
+        from components.java
+
         groupId = 'org.verkletries.besu'
         artifactId = 'verkle-tries'
         version = project.version
+
         pom {
           name = "Verkle Tries - ${project.name}"
           description = 'VerkleTries'
@@ -56,25 +57,24 @@ allprojects {
             }
           }
           scm {
-            connection = 'scm:git:git://github.com/Quadratic-Labs/VerkleTries_Besu'
-            developerConnection = 'scm:git:ssh://github.com/Quadratic-Labs/VerkleTries_Besu'
+            connection = 'scm:git:git://github.com/Quadratic-Labs/VerkleTries_Besu.git'
+            developerConnection = 'scm:git:ssh://github.com/Quadratic-Labs/VerkleTries_Besu.git'
             url = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
           }
         }
       }
     }
-  }
 
-  bintray {
-    publications = ['MavenDeployment']
-    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : 'invalid'
-    key = project.hasProperty('bintrayKey') ? project.property('bintrayKey') : 'invalid'
-    pkg {
-      repo = project.hasProperty('bintrayRepo') ? project.property('bintrayRepo') : 'invalid'
-      name = project.hasProperty('bintrayName') ? project.property('bintrayName') : 'invalid'
-      userOrg = project.hasProperty('bintrayOrg') ? project.property('bintrayOrg') : 'invalid'
-      licenses = ['Apache-2.0']
-      vcsUrl = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
+    repositories {
+      maven {
+        name = "OSSRH" // Sonatype's OSS Repository Hosting
+        url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+
+        credentials {
+          username = project.findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
+          password = project.findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
+        }
+      }
     }
   }
 }
