@@ -14,18 +14,20 @@
  */
 
 buildscript {
-    repositories {
-        mavenCentral()
-    }
+  repositories {
+    mavenCentral()
+  }
 }
 
 plugins {
-    id 'maven-publish'
+  id 'maven-publish'
+  id 'signing'
 }
 
 allprojects {
   apply plugin: 'java-library'
   apply plugin: 'maven-publish'
+  apply plugin: 'signing'
 
   sourceCompatibility = 17
   targetCompatibility = 17
@@ -33,13 +35,34 @@ allprojects {
   repositories {
     mavenCentral()
     maven {
-        url = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
+      url = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
     }
   }
 
+  artifacts {
+    archives jar
+  }
+
+  signing {
+    useGpgCmd()
+    sign configurations.archives
+  }
+
   publishing {
+    repositories {
+      maven {
+        name = "OSSRH" // Sonatype's OSS Repository Hosting
+        url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+
+        credentials {
+          username = project.findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
+          password = project.findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
+        }
+      }
+    }
+
     publications {
-      mavenJava(MavenPublication) {
+      MavenDeployment(MavenPublication) { publication ->
         from components.java
 
         groupId = 'org.verkletries.besu'
@@ -61,18 +84,6 @@ allprojects {
             developerConnection = 'scm:git:ssh://github.com/Quadratic-Labs/VerkleTries_Besu.git'
             url = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
           }
-        }
-      }
-    }
-
-    repositories {
-      maven {
-        name = "OSSRH" // Sonatype's OSS Repository Hosting
-        url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-
-        credentials {
-          username = project.findProperty("ossrhUsername") ?: System.getenv("OSSRH_USERNAME")
-          password = project.findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
         }
       }
     }
