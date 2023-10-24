@@ -28,37 +28,11 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.2'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.2'
     testImplementation 'org.assertj:assertj-core:3.22.0'
-    testImplementation 'org.mockito:mockito-core:4.4.0'
 }
 
 test {
   useJUnitPlatform()
 }
-
-
-task macArmLibCopy(type: Copy) {
-  from 'build/darwin-aarch64/lib/libipa_multipoint_jni.dylib'
-  into 'build/resources/main/darwin-aarch64'
-}
-processResources.dependsOn macArmLibCopy
-
-task macLibCopy(type: Copy) {
-  from 'build/darwin-x86-64/lib/libipa_multipoint_jni.dylib'
-  into 'build/resources/main/darwin-x86-64'
-}
-processResources.dependsOn macLibCopy
-
-task linuxLibCopy(type: Copy) {
-  from 'build/linux-gnu-x86_64/lib/libipa_multipoint_jni.so'
-  into 'build/resources/main/linux-x86-64'
-}
-processResources.dependsOn linuxLibCopy
-
-task linuxArm64LibCopy(type: Copy) {
-  from 'build/linux-gnu-aarch64/lib/libipa_multipoint_jni.so'
-  into 'build/resources/main/linux-aarch64'
-}
-processResources.dependsOn linuxArm64LibCopy
 
 jar {
   archiveBaseName = 'besu-native-ipa-multipoint'
@@ -85,7 +59,6 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
   classifier = 'javadoc'
   from javadoc.destinationDir
 }
-
 
 publishing {
   publications {
@@ -138,4 +111,3 @@ artifactory {
     }
   }
 }
-
