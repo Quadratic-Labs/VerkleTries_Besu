@@ -13,13 +13,68 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'maven-publish'
+    id 'com.jfrog.bintray' version '1.8.5'
+}
+
 allprojects {
   apply plugin: 'java-library'
+  apply plugin: 'com.jfrog.bintray'
+  apply plugin: 'maven-publish'
 
-  sourceCompatibility = 11
-  targetCompatibility = 11
+  sourceCompatibility = 17
+  targetCompatibility = 17
 
   repositories {
     mavenCentral()
+    maven {
+        url = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
+    }
+  }
+
+  publishing {
+    publications {
+      mavenJava(MavenPublication) {
+        groupId = 'org.verkletries.besu'
+        artifactId = 'verkle-tries'
+        version = project.versio
+        pom {
+          name = "Besu Native - ${project.name}"
+          description = 'VerkleTries'
+          url = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
+          licenses {
+            license {
+              name = 'The Apache License, Version 2.0'
+              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            }
+          }
+          scm {
+            connection = 'scm:git:git://github.com/Quadratic-Labs/VerkleTries_Besu'
+            developerConnection = 'scm:git:ssh://github.com/Quadratic-Labs/VerkleTries_Besu'
+            url = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
+          }
+        }
+      }
+    }
+  }
+
+  bintray {
+    publications = ['MavenDeployment']
+    user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : 'invalid'
+    key = project.hasProperty('bintrayKey') ? project.property('bintrayKey') : 'invalid'
+    pkg {
+      repo = project.hasProperty('bintrayRepo') ? project.property('bintrayRepo') : 'invalid'
+      name = project.hasProperty('bintrayName') ? project.property('bintrayName') : 'invalid'
+      userOrg = project.hasProperty('bintrayOrg') ? project.property('bintrayOrg') : 'invalid'
+      licenses = ['Apache-2.0']
+      vcsUrl = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
+    }
   }
 }
