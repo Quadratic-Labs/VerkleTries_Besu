@@ -20,8 +20,10 @@ buildscript {
 }
 
 plugins {
+  id 'java-library'
   id 'maven-publish'
   id 'signing'
+  id 'com.jfrog.artifactory' version '4.20.0'
 }
 
 allprojects {
@@ -51,7 +53,7 @@ allprojects {
   publishing {
     repositories {
       maven {
-        name = "OSSRH" // Sonatype's OSS Repository Hosting
+        name = "OSSRH"
         url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
 
         credentials {
@@ -59,14 +61,15 @@ allprojects {
           password = project.findProperty("ossrhPassword") ?: System.getenv("OSSRH_PASSWORD")
         }
       }
+      // Include the artifactory configurations here based on the Besu native repository.
     }
 
     publications {
       MavenDeployment(MavenPublication) { publication ->
         from components.java
 
-        groupId = 'org.verkletries.besu'
-        artifactId = 'verkle-tries'
+        groupId = 'org.hyperledger.besu'  // Updated groupId
+        artifactId = 'besu-verkle-trie'   // Updated artifactId
         version = project.version
 
         pom {
@@ -87,5 +90,26 @@ allprojects {
         }
       }
     }
+  }
+
+  def artifactoryUser = project.hasProperty('artifactoryUser') ? project.property('artifactoryUser') : System.getenv('ARTIFACTORY_USER')
+  def artifactoryKey = project.hasProperty('artifactoryApiKey') ? project.property('artifactoryApiKey') : System.getenv('ARTIFACTORY_KEY')
+  def artifactoryRepo = System.getenv('ARTIFACTORY_REPO') ?: 'besu-maven'
+  def artifactoryOrg = System.getenv('ARTIFACTORY_ORG') ?: 'hyperledger'
+
+  artifactory {
+      contextUrl = "https://hyperledger.jfrog.io/${artifactoryOrg}"
+      publish {
+          repository {
+              repoKey = artifactoryRepo
+              username = artifactoryUser
+              password = artifactoryKey
+          }
+          defaults {
+              publications('mavenJava')
+              publishArtifacts = true
+              publishPom = true
+          }
+      }
   }
 }
