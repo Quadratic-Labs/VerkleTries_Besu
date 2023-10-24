@@ -34,6 +34,8 @@ allprojects {
   sourceCompatibility = 17
   targetCompatibility = 17
 
+  tasks.withType(Javadoc).all { enabled = false }
+
   repositories {
     mavenCentral()
     maven {
