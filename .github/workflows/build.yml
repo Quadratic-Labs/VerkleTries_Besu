@@ -30,5 +30,3 @@ jobs:
       env:
         ARTIFACTORY_USER: ${{ secrets.ARTIFACTORY_USER }}
         ARTIFACTORY_KEY: ${{ secrets.ARTIFACTORY_KEY }}
-        ARTIFACTORY_REPO: ${{ secrets.ARTIFACTORY_REPO }}
-        ARTIFACTORY_ORG: ${{ secrets.ARTIFACTORY_ORG }}
