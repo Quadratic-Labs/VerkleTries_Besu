@@ -44,9 +44,9 @@ allprojects {
       mavenJava(MavenPublication) {
         groupId = 'org.verkletries.besu'
         artifactId = 'verkle-tries'
-        version = project.versio
+        version = project.version
         pom {
-          name = "Besu Native - ${project.name}"
+          name = "Verkle Tries - ${project.name}"
           description = 'VerkleTries'
           url = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
           licenses {
