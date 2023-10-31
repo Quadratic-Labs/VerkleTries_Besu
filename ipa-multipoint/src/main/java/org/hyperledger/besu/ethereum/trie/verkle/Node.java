@@ -28,6 +28,10 @@ import org.apache.tuweni.bytes.Bytes32;
  */
 public interface Node<V> {
 
+
+    /**
+     * A constant representing an empty hash value.
+     */
     Bytes32 EMPTY_HASH = Bytes32.ZERO;
 
     /**
