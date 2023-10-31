@@ -19,9 +19,9 @@ import org.apache.tuweni.rlp.RLPWriter;
 public class BranchNode<V> implements Node<V> {
     private final Optional<Bytes> location;  // Location in the tree
     private final Bytes path;  // Extension path
-    private final Optional<Bytes32> hash;  // vector commitment of children's commitments
-    private Optional<Bytes> encodedValue = Optional.empty();
-    private List<Node<V>> children;
+    private final Optional<Bytes32> hash;  // Vector commitment of children's commitments
+    private Optional<Bytes> encodedValue = Optional.empty(); // Encoded value
+    private List<Node<V>> children; // List of children nodes
 
     private boolean dirty = true;  // not persisted
 
@@ -48,8 +48,8 @@ public class BranchNode<V> implements Node<V> {
     /**
      * Constructs a new BranchNode with optional location, optional hash, path, and children.
      *
-     * @param location The optional location in the tree.
-     * @param hash The optional vector commitment of children's commitments.
+     * @param location The optional location in the tree (Optional).
+     * @param hash The optional vector commitment of children's commitments (Optional).
      * @param path The extension path.
      * @param children The list of children nodes.
      */
@@ -68,7 +68,7 @@ public class BranchNode<V> implements Node<V> {
     /**
      * Constructs a new BranchNode with optional location, path, and children.
      *
-     * @param location The optional location in the tree.
+     * @param location The optional location in the tree (Optional).
      * @param path The extension path.
      * @param children The list of children nodes.
      */
@@ -86,7 +86,7 @@ public class BranchNode<V> implements Node<V> {
     /**
      * Constructs a new BranchNode with optional location and path, initializing children to NullNodes.
      *
-     * @param location The optional location in the tree.
+     * @param location The optional location in the tree (Optional).
      * @param path The extension path.
      */
     public BranchNode(final Optional<Bytes> location, final Bytes path) {
