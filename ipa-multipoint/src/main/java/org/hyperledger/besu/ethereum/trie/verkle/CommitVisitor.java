@@ -16,14 +16,33 @@ package org.hyperledger.besu.ethereum.trie.verkle;
 
 import org.apache.tuweni.bytes.Bytes;
 
+/**
+ * A visitor class responsible for committing changes to nodes in a Trie tree.
+ *
+ * It iterates through the nodes and stores the changes in the Trie structure.
+ *
+ * @param <V> The type of node values.
+ */
 public class CommitVisitor<V> implements PathNodeVisitor<V> {
 
     protected final NodeUpdater nodeUpdater;
 
+    /**
+     * Constructs a CommitVisitor with a provided NodeUpdater.
+     *
+     * @param nodeUpdater The NodeUpdater used to store changes in the Trie structure.
+     */
     public CommitVisitor(final NodeUpdater nodeUpdater) {
         this.nodeUpdater = nodeUpdater;
     }
 
+    /**
+     * Visits a BranchNode to commit any changes in the node and its children.
+     *
+     * @param branchNode The BranchNode being visited.
+     * @param location The location in the Trie tree.
+     * @return The visited BranchNode.
+     */
     @Override
     public Node<V> visit(final BranchNode<V> branchNode, final Bytes location) {
         if (!branchNode.isDirty()) {
@@ -38,6 +57,13 @@ public class CommitVisitor<V> implements PathNodeVisitor<V> {
         return branchNode;
     }
 
+    /**
+     * Visits a LeafNode to commit any changes in the node.
+     *
+     * @param leafNode The LeafNode being visited.
+     * @param location The location in the Trie tree.
+     * @return The visited LeafNode.
+     */
     @Override
     public Node<V> visit(final LeafNode<V> leafNode, final Bytes location) {
         if (!leafNode.isDirty()) {
@@ -47,6 +73,13 @@ public class CommitVisitor<V> implements PathNodeVisitor<V> {
         return leafNode;
     }
 
+    /**
+     * Visits a NullNode, indicating no changes to commit.
+     *
+     * @param nullNode The NullNode being visited.
+     * @param location The location in the Trie tree.
+     * @return The NullNode indicating no changes.
+     */
     @Override
     public Node<V> visit(final NullNode<V> nullNode, final Bytes location) {
         return nullNode;
