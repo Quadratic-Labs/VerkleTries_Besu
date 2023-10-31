@@ -19,7 +19,7 @@ import org.apache.tuweni.bytes.Bytes;
 /**
  * A visitor class responsible for committing changes to nodes in a Trie tree.
  *
- * It iterates through the nodes and stores the changes in the Trie structure.
+ * <p>It iterates through the nodes and stores the changes in the Trie structure.
  *
  * @param <V> The type of node values.
  */
