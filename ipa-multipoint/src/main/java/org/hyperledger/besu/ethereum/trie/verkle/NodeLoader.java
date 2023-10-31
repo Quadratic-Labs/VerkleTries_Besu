@@ -19,6 +19,17 @@ import java.util.Optional;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 
+/**
+ * An interface representing a loader for retrieving nodes in the Verkle Trie.
+ */
 public interface NodeLoader {
+
+    /**
+     * Retrieve a node with the given location and hash.
+     *
+     * @param location The location of the node.
+     * @param hash The hash of the node.
+     * @return An optional containing the retrieved node, or empty if not found.
+     */
     public Optional<Bytes> getNode(Bytes location, Bytes32 hash);
 }

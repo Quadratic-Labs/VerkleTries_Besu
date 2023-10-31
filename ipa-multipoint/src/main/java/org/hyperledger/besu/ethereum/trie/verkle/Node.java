@@ -37,7 +37,6 @@ public interface Node<V> {
      * @param path The path associated with a node.
      * @return The result of visitor's operation.
      */
-
     Node<V> accept(PathNodeVisitor<V> visitor, Bytes path);
 
     /**

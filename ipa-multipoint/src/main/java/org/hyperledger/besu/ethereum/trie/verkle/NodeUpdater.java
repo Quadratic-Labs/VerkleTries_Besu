@@ -17,8 +17,17 @@ package org.hyperledger.besu.ethereum.trie.verkle;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 
+/**
+ * An interface representing a node updater for storing nodes in the Verkle Trie.
+ */
 public interface NodeUpdater {
-    //This method is called to ask Besu to save the node in the database (value is the node represented as a list of bytes.
-    //RLP or something else for verkle).
+
+    /**
+     * Store a node in the database with the specified location and hash.
+     *
+     * @param location The location of the node.
+     * @param hash The hash of the node.
+     * @param value The node represented as a list of bytes (e.g., RLP-encoded data).
+     */
     void store(Bytes location, Bytes32 hash, Bytes value);
 }
