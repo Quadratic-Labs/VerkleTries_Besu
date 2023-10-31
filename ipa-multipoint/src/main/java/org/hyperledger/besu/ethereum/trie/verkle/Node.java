@@ -21,36 +21,91 @@ import java.util.Optional;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 
+/**
+ * An interface representing a node in the Verkle Trie.
+ *
+ * @param <V> The type of the node's value.
+ */
 public interface Node<V> {
 
     Bytes32 EMPTY_HASH = Bytes32.ZERO;
 
+    /**
+     * Accept a visitor to perform operations on the node based on a provided path.
+     *
+     * @param visitor The visitor to accept.
+     * @param path The path associated with a node.
+     * @return The result of visitor's operation.
+     */
+
     Node<V> accept(PathNodeVisitor<V> visitor, Bytes path);
 
+    /**
+     * Accept a visitor to perform operations on the node.
+     *
+     * @param visitor The visitor to accept.
+     * @return The result of the visitor's operation.
+     */
     Node<V> accept(NodeVisitor<V> visitor);
 
+    /**
+     * Get the path associated with the node.
+     *
+     * @return The path of the node.
+     */
     default Bytes getPath() {
         return Bytes.EMPTY;
     };
 
+    /**
+     * Get the location of the node.
+     *
+     * @return An optional containing the location of the node if available.
+     */
     default Optional<Bytes> getLocation() {
         return Optional.empty();
     }
 
+    /**
+     * Get the value associated with the node.
+     *
+     * @return An optional containing the value of the node if available.
+     */
     default Optional<V> getValue() {
         return Optional.empty();
     };
 
+    /**
+     * Get the hash associated with the node.
+     *
+     * @return An optional containing the hash of the node if available.
+     */
     default Optional<Bytes32> getHash() {
         return Optional.empty();
     };
 
+    /**
+     * Replace the path of the node.
+     *
+     * @param path The new path to set.
+     * @return A new node with the updated path.
+     */
     Node<V> replacePath(Bytes path);
 
+    /**
+     * Get the encoded value of the node.
+     *
+     * @return The encoded value of the node.
+     */
     default Bytes getEncodedValue() {
         return Bytes.EMPTY;
     }
 
+    /**
+     * Get the children nodes of this node.
+     *
+     * @return A list of children nodes.
+     */
     default List<Node<V>> getChildren() {
         return Collections.emptyList();
     }
@@ -65,5 +120,10 @@ public interface Node<V> {
      */
     boolean isDirty();
 
+    /**
+     * Get a string representation of the node.
+     *
+     * @return A string representation of the node.
+     */
     String print();
 }
