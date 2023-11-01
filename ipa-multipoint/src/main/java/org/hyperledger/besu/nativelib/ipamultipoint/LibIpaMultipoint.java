@@ -64,8 +64,8 @@ public class LibIpaMultipoint {
 
   /**
    * Pedersen hash as specified in https://notes.ethereum.org/@vbuterin/verkle_tree_eip
-   * @param input Expects 64byte value as input encoded as byte[] e.g. "0x000..." <-> [48,48,48...] (48 is 0 in ASCII)
-   * @return 32bytes as byte[]  "0x000..." <-> [48,48,48...] (48 is 0 in ASCII)
+   * @param input Expects 64-byte value as input encoded as byte[] e.g. "0x000..." -&gt; [48,48,48...] (48 is 0 in ASCII)
+   * @return 32 bytes as byte[]  "0x000..." -&gt; [48,48,48...] (48 is 0 in ASCII)
    */
   public static native byte[] pedersenHash(byte[] input);
 }
