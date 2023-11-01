@@ -27,6 +27,10 @@ public class NullNode<V> implements Node<V> {
     @SuppressWarnings("rawtypes")
     private static final NullNode instance = new NullNode();
 
+    /**
+     * Constructs a new `NullNode`.
+     * This constructor is protected to ensure that `NullNode` instances are only created as singletons.
+     */
     protected NullNode() {}
 
     /**

@@ -17,7 +17,11 @@ import org.apache.tuweni.rlp.RLPWriter;
  */
 public class LeafNode<V> implements Node<V>{
     private final Optional<Bytes> location; // Location in the tree
-    protected final V value; // Value associated with the node
+
+    /**
+     * Value associated with the node.
+     */
+    protected final V value;
     private final Bytes path; // Extension path
     private final Optional<Bytes32> hash; // Hash of the node
     private Optional<Bytes> encodedValue = Optional.empty(); // Encoded value

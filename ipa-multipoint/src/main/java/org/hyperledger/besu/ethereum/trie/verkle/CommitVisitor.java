@@ -25,6 +25,9 @@ import org.apache.tuweni.bytes.Bytes;
  */
 public class CommitVisitor<V> implements PathNodeVisitor<V> {
 
+    /**
+     * The NodeUpdater used to store changes in the Trie structure.
+     */
     protected final NodeUpdater nodeUpdater;
 
     /**

@@ -28,6 +28,10 @@ import java.io.IOException;
  */
 public class LibIpaMultipoint {
 
+  /**
+   * Indicates whether the ipa-multipoint library is available and enabled. If true, the library
+   * is available; otherwise, it is not.
+   */
   @SuppressWarnings("WeakerAccess")
   public static final boolean ENABLED;
 
