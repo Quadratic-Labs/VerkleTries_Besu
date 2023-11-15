@@ -1,0 +1,17 @@
+[package]
+name = "test-root-hashes"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ark-ff = { version = "^0.3.0", default-features = false }
+ark-ec = { version = "^0.3.0", default-features = false }
+ark-serialize = { version = "^0.3.0", default-features = false }
+hex = "0.4.3"
+ipa-multipoint = { git = "https://github.com/crate-crypto/rust-verkle", version = "0.1.0" }
+once_cell = "1.18.0"
+verkle-db = { git = "https://github.com/crate-crypto/rust-verkle", version = "0.1.0" }
+verkle-spec = { git = "https://github.com/crate-crypto/rust-verkle", version = "0.1.0" }
+verkle-trie = { git = "https://github.com/crate-crypto/rust-verkle", version = "0.1.0" }
