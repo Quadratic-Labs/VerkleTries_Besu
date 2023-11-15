@@ -16,14 +16,36 @@ package org.hyperledger.besu.ethereum.trie.verkle;
 
 import org.apache.tuweni.bytes.Bytes;
 
-
+/**
+ * A visitor for inserting or updating values in a Verkle Trie.
+ *
+ * <p>This class implements the PathNodeVisitor interface and is used to visit and modify nodes in the Verkle Trie
+ * while inserting or updating a value associated with a specific path.
+ *
+ * @param <V> The type of values to insert or update.
+ */
 public class PutVisitor<V> implements PathNodeVisitor<V> {
     private V value;
 
+    /**
+     * Constructs a new PutVisitor with the provided value to insert or update.
+     *
+     * @param value The value to be inserted or updated in the Verkle Trie.
+     */
     public PutVisitor(V value) {
         this.value = value;
     }
 
+
+    /**
+     * Inserts or updates a value in a branch node.
+     *
+     * @param node The branch node to insert or update the value.
+     * @param commonPath The common path between the node and the path.
+     * @param pathSuffix The path suffix associated with the value.
+     * @param nodeSuffix The remaining node suffix after the common path.
+     * @return The updated node with the inserted or updated value.
+     */
     protected Node<V> insertNewBranching(
             final Node<V> node,
             final Bytes commonPath,
@@ -38,6 +60,13 @@ public class PutVisitor<V> implements PathNodeVisitor<V> {
         return newBranchNode;
     }
 
+    /**
+     * Visits a branch node to insert or update a value associated with the provided path.
+     *
+     * @param branchNode The branch node to visit.
+     * @param path The path associated with the value to insert or update.
+     * @return The updated branch node with the inserted or updated value.
+     */
     @Override
     public Node<V> visit(final BranchNode<V> branchNode, final Bytes path) {
         final Bytes nodePath = branchNode.getPath();
@@ -58,6 +87,13 @@ public class PutVisitor<V> implements PathNodeVisitor<V> {
         }
     }
 
+    /**
+     * Visits a leaf node to insert or update a value associated with the provided path.
+     *
+     * @param leafNode The leaf node to visit.
+     * @param path The path associated with the value to insert or update.
+     * @return The updated leaf node with the inserted or updated value.
+     */
     @Override
     public Node<V> visit(final LeafNode<V> leafNode, final Bytes path) {
         /* Leaf node is used to store a value.
@@ -78,6 +114,13 @@ public class PutVisitor<V> implements PathNodeVisitor<V> {
         return insertNewBranching(leafNode, commonPath, pathSuffix, nodeSuffix);
     }
 
+    /**
+     * Visits a null node to insert or update a value associated with the provided path.
+     *
+     * @param nullNode The null node to visit.
+     * @param path The path associated with the value to insert or update.
+     * @return A new leaf node containing the inserted or updated value.
+     */
     @Override
     public Node<V> visit(final NullNode<V> nullNode, final Bytes path) {
         return new LeafNode<V>(value, path);

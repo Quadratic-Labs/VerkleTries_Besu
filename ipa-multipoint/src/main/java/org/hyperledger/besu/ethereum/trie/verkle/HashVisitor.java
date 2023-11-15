@@ -6,10 +6,21 @@ import java.util.Optional;
 import org.apache.tuweni.bytes.Bytes;
 import org.apache.tuweni.bytes.Bytes32;
 
-
+/**
+ * A visitor class for hashing operations on Verkle Trie nodes.
+ *
+ * @param <V> The type of the node's value.
+ */
 public class HashVisitor<V extends Bytes> implements PathNodeVisitor<V> {
-    Hasher<Bytes32> hasher = new IPAHasher();    
+    Hasher<Bytes32> hasher = new IPAHasher();
 
+    /**
+     * Visits a branch node, computes its hash, and returns a new branch node with the updated hash.
+     *
+     * @param branchNode The branch node to visit.
+     * @param location The location associated with the branch node.
+     * @return A new branch node with the updated hash.
+     */
     @Override
     public Node<V> visit(BranchNode<V> branchNode, Bytes location) {
         if (!branchNode.isDirty() && branchNode.getHash().isPresent()) {
@@ -35,6 +46,13 @@ public class HashVisitor<V extends Bytes> implements PathNodeVisitor<V> {
         return branchNode.replaceHash(hashExtension(branchNode.getPath(), baseHash));
     }
 
+    /**
+     * Visits a leaf node, computes its hash, and returns a new leaf node with the updated hash.
+     *
+     * @param leafNode The leaf node to visit.
+     * @param location The location associated with the leaf node.
+     * @return A new leaf node with the updated hash.
+     */
     @Override
     public Node<V> visit(LeafNode<V> leafNode, Bytes location) {
         Bytes path = leafNode.getPath();
@@ -50,12 +68,26 @@ public class HashVisitor<V extends Bytes> implements PathNodeVisitor<V> {
         return leafNode.replaceHash(hashExtension(path, baseHash));
     }
 
+    /**
+     * Visits a null node and returns the same null node.
+     *
+     * @param nullNode The null node to visit.
+     * @param location The location associated with the null node.
+     * @return The same null node.
+     */
     @Override
     public Node<V> visit(NullNode<V> nullNode, Bytes location) {
         return nullNode;
     }
 
-    // Should use commit_one. For now, using commit.
+    /**
+     * Computes the hash of a single value with a given index.
+     * <p> Should use commit_one. For now, using commit.
+     *
+     * @param value The value to hash.
+     * @param index The index associated with the value.
+     * @return The hash of the value.
+     */
     Bytes32 hashOne(Bytes32 value, byte index) {
         int idx = Byte.toUnsignedInt(index); 
         Bytes32[] values = new Bytes32[idx + 1];
@@ -64,6 +96,14 @@ public class HashVisitor<V extends Bytes> implements PathNodeVisitor<V> {
         return hasher.commit(values);
     }
 
+
+    /**
+     * Computes the hash of a branch node extension.
+     *
+     * @param path The path associated with the extension.
+     * @param baseHash The base hash.
+     * @return The hash of the branch node extension.
+     */
     Bytes32 hashExtension(Bytes path, Bytes32 baseHash) {
         Bytes revPath = path.reverse();
         Bytes32 hash = baseHash;
@@ -73,6 +113,14 @@ public class HashVisitor<V extends Bytes> implements PathNodeVisitor<V> {
         return hash;
     }
 
+    /**
+     * Computes the hash of a branch node stem extension.
+     *
+     * @param stem The stem of the branch node.
+     * @param leftValues The left values associated with the stem.
+     * @param rightValues The right values associated with the stem.
+     * @return The hash of the stem extension.
+     */
     Bytes32 hashStemExtension(Bytes stem, Bytes32[] leftValues, Bytes32[] rightValues) {
         Bytes32[] extensionHashes = new Bytes32[4];
         extensionHashes[0] = Bytes32.rightPad(Bytes.of((byte) 1).reverse());  // extension marker
@@ -82,7 +130,17 @@ public class HashVisitor<V extends Bytes> implements PathNodeVisitor<V> {
         return hasher.commit(extensionHashes);
     }
 
-    // Should use commit_sparse to commit low and high values
+
+    /**
+     * Computes the hash of a branch node stem extension with a single value.
+     * <p> Should use commit_sparse to commit low and high values
+     *
+     * @param stem The stem of the branch node.
+     * @param value The value associated with the stem extension.
+     * @param index The index associated with the value.
+     * @return The hash of the stem extension with a single value.
+     */
+    //
     Bytes32 hashStemExtensionOne(Bytes stem, Optional<V> value, byte index) {
         int idx = Byte.toUnsignedInt(index); 
         Bytes32 leftHash;
@@ -111,6 +169,12 @@ public class HashVisitor<V extends Bytes> implements PathNodeVisitor<V> {
         return hasher.commit(extensionHashes);
     }
 
+    /**
+     * Retrieves the low value part of a given optional value.
+     *
+     * @param value The optional value.
+     * @return The low value.
+     */
     Bytes32 getLowValue(Optional<V> value) {
         // Low values have a flag at bit 128.
         if (!value.isPresent()) {
@@ -119,6 +183,12 @@ public class HashVisitor<V extends Bytes> implements PathNodeVisitor<V> {
         return Bytes32.rightPad(Bytes.concatenate(value.get().slice(0, 16), Bytes.of((byte) 1).reverse()));
     }
 
+    /**
+     * Retrieves the high value part of a given optional value.
+     *
+     * @param value The optional value.
+     * @return The high value.
+     */
     Bytes32 getHighValue(Optional<V> value) {
         if (!value.isPresent()) {
             return Bytes32.ZERO;
@@ -126,6 +196,13 @@ public class HashVisitor<V extends Bytes> implements PathNodeVisitor<V> {
         return Bytes32.rightPad(value.get().slice(16, 16));
     }
 
+    /**
+     * Computes the hash of values within a branch node.
+     *
+     * @param branchNode The branch node containing values.
+     * @param location The location associated with the branch node.
+     * @return The hash of the values within the branch node.
+     */
     Bytes32 hashValues(BranchNode<V> branchNode, Bytes location) {
         // Values are little endian
         // Values are decomposed into 16 lower bytes and 16 higher bytes
