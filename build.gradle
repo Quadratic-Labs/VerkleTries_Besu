@@ -13,13 +13,90 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+}
+
+plugins {
+  id 'java-library'
+  id 'maven-publish'
+  id 'signing'
+  id 'com.jfrog.artifactory' version '4.20.0'
+}
+
 allprojects {
   apply plugin: 'java-library'
+  apply plugin: 'maven-publish'
+  apply plugin: 'signing'
 
-  sourceCompatibility = 11
-  targetCompatibility = 11
+  sourceCompatibility = 17
+  targetCompatibility = 17
 
   repositories {
     mavenCentral()
+    maven {
+      url = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
+    }
+  }
+
+  artifacts {
+    archives jar
+  }
+
+  signing {
+    useGpgCmd()
+    sign configurations.archives
+  }
+
+  publishing {
+    publications {
+      MavenDeployment(MavenPublication) { publication ->
+        from components.java
+
+        groupId = 'org.hyperledger.besu'  // Updated groupId
+        artifactId = 'besu-verkle-trie'   // Updated artifactId
+        version = project.version
+
+        pom {
+          name = "Verkle Tries - ${project.name}"
+          description = 'VerkleTries'
+          url = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
+          licenses {
+            license {
+              name = 'The Apache License, Version 2.0'
+              url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            }
+          }
+          scm {
+            connection = 'scm:git:git://github.com/Quadratic-Labs/VerkleTries_Besu.git'
+            developerConnection = 'scm:git:ssh://github.com/Quadratic-Labs/VerkleTries_Besu.git'
+            url = 'https://github.com/Quadratic-Labs/VerkleTries_Besu'
+          }
+        }
+      }
+    }
+  }
+
+  def artifactoryUser = project.hasProperty('artifactoryUser') ? project.property('artifactoryUser') : System.getenv('ARTIFACTORY_USER')
+  def artifactoryKey = project.hasProperty('artifactoryApiKey') ? project.property('artifactoryApiKey') : System.getenv('ARTIFACTORY_KEY')
+  def artifactoryRepo = System.getenv('ARTIFACTORY_REPO') ?: 'besu-maven'
+  def artifactoryOrg = System.getenv('ARTIFACTORY_ORG') ?: 'hyperledger'
+
+  artifactory {
+      contextUrl = "https://hyperledger.jfrog.io/${artifactoryOrg}"
+      publish {
+          repository {
+              repoKey = artifactoryRepo
+              username = artifactoryUser
+              password = artifactoryKey
+          }
+          defaults {
+              publications('mavenJava')
+              publishArtifacts = true
+              publishPom = true
+          }
+      }
   }
 }
