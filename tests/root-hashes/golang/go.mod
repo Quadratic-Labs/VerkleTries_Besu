@@ -2,7 +2,9 @@ module main
 
 go 1.20
 
-require github.com/gballet/go-verkle v0.1.1-0.20231106194815-76183efeacf4
+require (
+	github.com/matkt/go-verkle v0.1.1-test
+)
 
 require (
 	github.com/bits-and-blooms/bitset v1.7.0 // indirect
