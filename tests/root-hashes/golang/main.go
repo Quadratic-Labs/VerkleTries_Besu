@@ -135,10 +135,10 @@ func TestTwoValuesWithDivergentStemsAtDepth2() {
 
 func TestGenesis() {
 	var root = verkle.New()
-	var hash verkle.Fr
+	//var hash verkle.Fr
 
 	data := []string{
-		"0xcf5bb2b9e47b45594fe7ca77ef59f9a51d82776bd457fb5b4ef562d60190f640,0x985e929f70af28d0bdd1a90a808f977f597c7c778c489e98d3bd8910d31ac0f7",
+		"0x9fd0c07327beb70556b6edaeb9d9e1246a4a44830c0aa50aa266cc12847eda40,0x985e929f70af28d0bdd1a90a808f977f597c7c778c489e98d3bd8910d31ac0f7",
 		"0xc43a5184f61b02b1e21512facb6deb3c01c1e6909158cccda8267b6618c44f66,0x9efde052aa15429fae05bad4d0b1d7c64da64d03d7a1854a588c2cb8430c0d30",
 		"0xc43a5184f61b02b1e21512facb6deb3c01c1e6909158cccda8267b6618c44f70,0xd49a7502ffcfb0340b1d7885688500ca308161a7f96b62df9d083b71fcc8f2bb",
 		"0xc43a5184f61b02b1e21512facb6deb3c01c1e6909158cccda8267b6618c44f7a,0x21352bfecbeddde993839f614c3dac0a3ee37543f9b412b16199dc158e23b544",
@@ -1460,10 +1460,12 @@ func TestGenesis() {
 	}
 
 	root.Commit()
-	hash = *root.Hash()
-	fmt.Printf("TestGenesis() -- Hash: %x\n", hash.BytesLE())
+	//hash = *root.Hash()
+	//	fmt.Printf("TestGenesis() -- Hash: %x\n", hash.BytesLE())
 
-	fmt.Printf(root.ToDot("", ""))
+	hashBytes := root.Commit().Bytes()
+	fmt.Printf("TestGenesis() -- Hash: %x\n", string(hashBytes[:]))
+
 }
 
 func main() {

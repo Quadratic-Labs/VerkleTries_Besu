@@ -19,6 +19,8 @@ github.com/gballet/go-verkle v0.1.1-0.20231106194815-76183efeacf4/go.mod h1:QNpY
 github.com/gballet/go-verkle v0.1.1-0.20231130133252-5a8a683fa581 h1:nKbTGOGvrSo4ei3AlYN+Cbnp23AzgOl7nezMsZEIyDI=
 github.com/gballet/go-verkle v0.1.1-0.20231130133252-5a8a683fa581/go.mod h1:OzHSBt37xRRHc27lb9PaCldBnJYQZP8KcMdYyOB2dtU=
 github.com/google/subcommands v1.2.0/go.mod h1:ZjhPrFU+Olkh9WazFPsl27BQ4UPiG37m3yTrtFlrHVk=
+github.com/holiman/uint256 v1.2.4 h1:jUc4Nk8fm9jZabQuqr2JzednajVmBpC+oiTiXZJEApU=
+github.com/holiman/uint256 v1.2.4/go.mod h1:EOMSn4q6Nyt9P6efbI3bueV4e1b3dGlUCXeiRV4ng7E=
 github.com/matkt/go-verkle v0.1.1-dot h1:jEUwUYW0LIn9a6zPJKo4o6HE+SeNIz8lP/S6KqIDA+U=
 github.com/matkt/go-verkle v0.1.1-dot/go.mod h1:F3OmUDCN5g0ngIE4in9uQfeMeigy3i29CNk5uC2+zs0=
 github.com/matkt/go-verkle v0.1.1-matkt h1:Sm0aA0f6/oRmQGnR0Erv6lDCmBrhAoVhXHED2qC3Pik=
